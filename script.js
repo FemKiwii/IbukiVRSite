@@ -33,6 +33,12 @@ const CONFIG = {
     ],
 
     // No Discord ID given yet — leave disabled until you have one to plug in.
+    // To enable: 1) put your Discord user ID in discordId, 2) set enabled: true,
+    // 3) join the public Lanyard Discord (discord.gg/lanyard) — Lanyard can only
+    // see your presence for servers it shares with you. For the "now playing"
+    // widget specifically, also turn on Discord Settings > Activity Privacy >
+    // "Display current activity as a status message" and connect Spotify under
+    // Settings > Connections with "Display Spotify as your status" enabled.
     status: {
         enabled: false,
         discordId: "",
@@ -44,6 +50,9 @@ const CONFIG = {
     sections: [
         {
             divider: null,
+            // Add badge: "NEW" (or "HOT", etc.) to any link below to show a
+            // little pill next to its title, e.g.:
+            // { icon: "...", title: "...", subtitle: "...", url: "...", badge: "NEW" }
             links: [
                 { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@I_BukiVr", url: "https://x.com/I_BukiVr" },
                 { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
@@ -138,12 +147,23 @@ function render() {
             .then(r => r.json())
             .then(data => {
                 if (!data.success) throw new Error('lanyard lookup failed');
-                showStatus({
-                    avatar: `https://cdn.discordapp.com/avatars/${CONFIG.status.discordId}/${data.data.discord_user.avatar}.png`,
-                    handle: '@' + data.data.discord_user.username,
-                    text: data.data.discord_status,
-                    dotColor: { online: '#43b581', idle: '#faa61a', dnd: '#f04747', offline: '#747f8d' }[data.data.discord_status] || '#747f8d'
-                });
+                const d = data.data;
+                if (d.listening_to_spotify && d.spotify) {
+                    // Now-playing takes priority over plain online/idle/dnd status
+                    showStatus({
+                        avatar: d.spotify.album_art_url,
+                        handle: d.spotify.song,
+                        text: `🎧 ${d.spotify.artist}`,
+                        dotColor: '#1DB954'
+                    });
+                } else {
+                    showStatus({
+                        avatar: `https://cdn.discordapp.com/avatars/${CONFIG.status.discordId}/${d.discord_user.avatar}.png`,
+                        handle: '@' + d.discord_user.username,
+                        text: d.discord_status,
+                        dotColor: { online: '#43b581', idle: '#faa61a', dnd: '#f04747', offline: '#747f8d' }[d.discord_status] || '#747f8d'
+                    });
+                }
             })
             .catch(() => showStaticStatus());
     } else if (CONFIG.status.fallbackHandle) {
@@ -193,7 +213,7 @@ function render() {
             a.innerHTML = `
                 <span class="link-icon">${iconImg(link.icon)}</span>
                 <span class="link-text">
-                    <span class="link-title">${link.title}</span><br>
+                    <span class="link-title">${link.title}${link.badge ? `<span class="link-badge">${link.badge}</span>` : ''}</span><br>
                     <span class="link-subtitle">${link.subtitle}</span>
                 </span>
                 <span class="link-arrow">→</span>
@@ -210,7 +230,42 @@ document.addEventListener('DOMContentLoaded', () => {
     render();
     initStarField();
     initAgeGate();
+    initShareButton();
 });
+
+/* =========================================================
+   SHARE BUTTON — native share sheet on mobile, clipboard copy
+   as the fallback everywhere else.
+   ========================================================= */
+function initShareButton() {
+    const btn = document.getElementById('share-btn');
+    const label = document.getElementById('share-btn-label');
+    if (!btn || !label) return;
+    const originalLabel = label.textContent;
+
+    btn.addEventListener('click', async () => {
+        const url = window.location.href;
+        if (navigator.share) {
+            try {
+                await navigator.share({ title: CONFIG.name, text: CONFIG.bio.join(' '), url });
+            } catch (err) {
+                // User cancelled the share sheet — not an error, do nothing.
+            }
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(url);
+            flashLabel('Copied! ✓');
+        } catch (err) {
+            flashLabel('Copy failed');
+        }
+    });
+
+    function flashLabel(text) {
+        label.textContent = text;
+        setTimeout(() => { label.textContent = originalLabel; }, 1800);
+    }
+}
 
 /* =========================================================
    AGE GATE — for 18+ links (e.g. Fansly). Some states/countries
