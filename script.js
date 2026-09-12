@@ -178,4 +178,73 @@ function render() {
     document.getElementById('footer-text').textContent = CONFIG.footerText;
 }
 
-document.addEventListener('DOMContentLoaded', render);
+document.addEventListener('DOMContentLoaded', () => {
+    render();
+    initStarField();
+});
+
+/* =========================================================
+   STAR FIELD — a light canvas particle effect, tinted yellow.
+   Adapted from a connected-dot background into a twinkling
+   star look. Adjust STAR_COLOR / STAR_COUNT below to taste.
+   ========================================================= */
+function initStarField() {
+    const canvas = document.getElementById('bg-stars');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const STAR_COLOR = '184, 192, 18'; // lightened working-tint of brand yellow #54590C, as an "R, G, B" string
+    const STAR_COUNT = 90;
+
+    let stars = [];
+
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Star {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.vx = (Math.random() - 0.5) * 0.15;
+            this.vy = (Math.random() - 0.5) * 0.15;
+            this.size = Math.random() * 1.6 + 0.4;
+            this.twinkleSpeed = Math.random() * 0.015 + 0.005;
+            this.twinklePhase = Math.random() * Math.PI * 2;
+        }
+
+        update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            this.twinklePhase += this.twinkleSpeed;
+        }
+
+        draw() {
+            const twinkle = (Math.sin(this.twinklePhase) + 1) / 2; // 0 -> 1
+            const alpha = 0.15 + twinkle * 0.55;
+            ctx.fillStyle = `rgba(${STAR_COLOR}, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    for (let i = 0; i < STAR_COUNT; i++) {
+        stars.push(new Star());
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        stars.forEach(s => {
+            s.update();
+            s.draw();
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
