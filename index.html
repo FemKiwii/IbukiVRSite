@@ -76,6 +76,21 @@
         </footer>
     </main>
 
+    <!-- Age verification modal, shown before opening any 18+ link -->
+    <div class="age-gate-overlay" id="age-gate-overlay" hidden>
+        <div class="age-gate-card" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+            <h2 id="age-gate-title">Age Verification</h2>
+            <p class="age-gate-text">This link leads to 18+ content. Please confirm your date of birth to continue.</p>
+            <label class="age-gate-label" for="age-gate-dob">Date of birth</label>
+            <input type="date" id="age-gate-dob" class="age-gate-input">
+            <p class="age-gate-error" id="age-gate-error" aria-live="polite"></p>
+            <div class="age-gate-actions">
+                <button type="button" id="age-gate-cancel" class="age-gate-btn age-gate-btn-cancel">Cancel</button>
+                <button type="button" id="age-gate-confirm" class="age-gate-btn age-gate-btn-confirm">Continue</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

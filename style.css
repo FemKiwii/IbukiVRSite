@@ -411,3 +411,119 @@ footer p:hover {
         transform: none;
     }
 }
+
+/* ---------- Age gate modal ---------- */
+
+.age-gate-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    background: rgba(3, 11, 22, 0.72);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.age-gate-overlay[hidden] {
+    display: none;
+}
+
+.age-gate-card {
+    width: 100%;
+    max-width: 360px;
+    background: rgba(12, 46, 89, 0.35);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 1.5rem;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.age-gate-card h2 {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    margin: 0 0 0.6rem;
+}
+
+.age-gate-text {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin: 0 0 1.1rem;
+}
+
+.age-gate-label {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.age-gate-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    color-scheme: dark;
+}
+
+.age-gate-input:focus {
+    outline: none;
+    border-color: var(--accent);
+}
+
+.age-gate-error {
+    min-height: 1.2em;
+    font-size: 0.8rem;
+    color: #ff8080;
+    margin: 0.6rem 0 0;
+}
+
+.age-gate-actions {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+}
+
+.age-gate-btn {
+    flex: 1;
+    border-radius: 12px;
+    padding: 0.65rem 0.75rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--card-border);
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.age-gate-btn:hover {
+    transform: translateY(-1px);
+}
+
+.age-gate-btn-cancel {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-secondary);
+}
+
+.age-gate-btn-confirm {
+    background: var(--accent-brand-blue);
+    color: var(--text-main);
+    border-color: transparent;
+}
+
+.age-gate-btn-confirm:hover {
+    filter: brightness(1.15);
+}

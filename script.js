@@ -29,7 +29,7 @@ const CONFIG = {
         { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
         { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
         { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
-        { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL" }
+        { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
     ],
 
     // No Discord ID given yet — leave disabled until you have one to plug in.
@@ -45,10 +45,10 @@ const CONFIG = {
         {
             divider: null,
             links: [
-                { icon: "colored-icons/twitter.svg", title: "X", subtitle: "main social", url: "https://x.com/I_BukiVr" },
-                { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "support me", url: "https://ko-fi.com/ibuki_vr" },
-                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "my wishlist", url: "https://throne.com/ibukivr" },
-                { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL" }
+                { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@I_BukiVr", url: "https://x.com/I_BukiVr" },
+                { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
+                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" },
+                { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
             ]
         }
         // TODO: once you're ready for a second group (like the "ABOUT ME" divider
@@ -117,12 +117,17 @@ function render() {
     CONFIG.socials.forEach(s => {
         const a = document.createElement('a');
         a.className = 'social-icon';
-        a.href = s.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
         const label = s.icon.split('/').pop().replace(/-gradient|\.svg$/g, '');
         a.setAttribute('aria-label', label);
         a.title = label.charAt(0).toUpperCase() + label.slice(1);
+        if (s.ageGate) {
+            a.href = '#';
+            a.addEventListener('click', (e) => handleGatedClick(e, s.url));
+        } else {
+            a.href = s.url;
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+        }
         a.innerHTML = iconImg(s.icon);
         socialsRow.appendChild(a);
     });
@@ -177,9 +182,14 @@ function render() {
         section.links.forEach(link => {
             const a = document.createElement('a');
             a.className = 'link-row';
-            a.href = link.url;
-            a.target = '_blank';
-            a.rel = 'noopener noreferrer';
+            if (link.ageGate) {
+                a.href = '#';
+                a.addEventListener('click', (e) => handleGatedClick(e, link.url));
+            } else {
+                a.href = link.url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+            }
             a.innerHTML = `
                 <span class="link-icon">${iconImg(link.icon)}</span>
                 <span class="link-text">
@@ -199,7 +209,86 @@ function render() {
 document.addEventListener('DOMContentLoaded', () => {
     render();
     initStarField();
+    initAgeGate();
 });
+
+/* =========================================================
+   AGE GATE — for 18+ links (e.g. Fansly). Some states/countries
+   legally require an affirmative age check before linking out to
+   adult content. We only ask for a date of birth to compute age;
+   we don't store or transmit the DOB itself anywhere.
+   ========================================================= */
+let pendingGateUrl = null;
+
+function handleGatedClick(e, url) {
+    e.preventDefault();
+    if (sessionStorage.getItem('ageVerified18') === 'true') {
+        window.open(url, '_blank', 'noopener,noreferrer');
+        return;
+    }
+    pendingGateUrl = url;
+    const overlay = document.getElementById('age-gate-overlay');
+    const dobInput = document.getElementById('age-gate-dob');
+    const errorEl = document.getElementById('age-gate-error');
+    dobInput.value = '';
+    errorEl.textContent = '';
+    overlay.hidden = false;
+    dobInput.focus();
+}
+
+function closeAgeGate() {
+    document.getElementById('age-gate-overlay').hidden = true;
+    pendingGateUrl = null;
+}
+
+function confirmAgeGate() {
+    const dobInput = document.getElementById('age-gate-dob');
+    const errorEl = document.getElementById('age-gate-error');
+
+    if (!dobInput.value) {
+        errorEl.textContent = 'Please enter your date of birth.';
+        return;
+    }
+
+    const dob = new Date(dobInput.value + 'T00:00:00');
+    if (isNaN(dob.getTime()) || dob > new Date()) {
+        errorEl.textContent = 'Please enter a valid date of birth.';
+        return;
+    }
+
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    if (age >= 18) {
+        sessionStorage.setItem('ageVerified18', 'true');
+        const url = pendingGateUrl;
+        closeAgeGate();
+        if (url) window.open(url, '_blank', 'noopener,noreferrer');
+    } else {
+        errorEl.textContent = 'You must be 18 or older to view this content.';
+    }
+}
+
+function initAgeGate() {
+    const overlay = document.getElementById('age-gate-overlay');
+    if (!overlay) return;
+
+    document.getElementById('age-gate-confirm').addEventListener('click', confirmAgeGate);
+    document.getElementById('age-gate-cancel').addEventListener('click', closeAgeGate);
+    document.getElementById('age-gate-dob').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') confirmAgeGate();
+    });
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeAgeGate();
+    });
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !overlay.hidden) closeAgeGate();
+    });
+}
 
 /* =========================================================
    STAR FIELD — a light canvas particle effect, tinted yellow.
