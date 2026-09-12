@@ -231,6 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
     initStarField();
     initAgeGate();
     initShareButton();
+
+    const visitBadge = document.getElementById('visit-badge');
+    if (visitBadge) {
+        visitBadge.addEventListener('error', () => visitBadge.remove());
+    }
 });
 
 /* =========================================================
