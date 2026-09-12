@@ -127,13 +127,12 @@ function render() {
         tagsEl.appendChild(span);
     });
 
-    // Bio
-    const bioEl = document.getElementById('bio');
-    CONFIG.bio.forEach(line => {
-        const p = document.createElement('p');
-        p.textContent = line;
-        bioEl.appendChild(p);
-    });
+    // Bio — full text goes to a screen-reader-only span; the visible
+    // typewriter animation is handled separately by initTypewriterBio().
+    const bioSrEl = document.getElementById('bio-sr');
+    if (bioSrEl) {
+        bioSrEl.textContent = CONFIG.bio.join('. ');
+    }
 
     // Quick-copy handle pills
     const quickCopyRow = document.getElementById('quick-copy-row');
@@ -262,6 +261,8 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabTitleSwap();
     initCursorSparkles();
     initLogoEasterEgg();
+    initTypewriterBio();
+    initMusicToggle();
 
     requestAnimationFrame(() => {
         document.querySelector('.container').classList.add('loaded');
@@ -294,7 +295,6 @@ function initTabTitleSwap() {
    reduced-motion and touch-only (no real cursor) devices.
    ========================================================= */
 function initCursorSparkles() {
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
 
     const colors = ['184, 192, 18', '47, 111, 201'];
@@ -324,7 +324,6 @@ function initLogoEasterEgg() {
     const avatarWrap = document.querySelector('.avatar-wrap');
     if (!avatarWrap) return;
 
-    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const colors = ['184, 192, 18', '47, 111, 201'];
     let clicks = 0;
     let resetTimer = null;
@@ -341,7 +340,7 @@ function initLogoEasterEgg() {
     });
 
     function triggerEasterEgg() {
-        if (!reducedMotion) burstSparkles();
+        burstSparkles();
         showMessage();
     }
 
@@ -404,6 +403,85 @@ function initQuickCopy() {
                 labelEl.textContent = originalLabel;
                 btn.classList.remove('copied');
             }, 1600);
+        }
+    });
+}
+
+/* =========================================================
+   TYPEWRITER BIO — types out each CONFIG.bio line, pauses,
+   deletes, and moves to the next, looping forever. The full text
+   is also written to a screen-reader-only span in render() so
+   nobody has to wait on the animation to read it.
+   ========================================================= */
+function initTypewriterBio() {
+    const el = document.getElementById('bio-typed');
+    if (!el || !CONFIG.bio || !CONFIG.bio.length) return;
+
+    const lines = CONFIG.bio;
+    let lineIndex = 0;
+    let charIndex = 0;
+    let deleting = false;
+
+    function tick() {
+        const line = lines[lineIndex];
+
+        if (!deleting) {
+            charIndex++;
+            el.textContent = line.slice(0, charIndex);
+            if (charIndex === line.length) {
+                setTimeout(() => { deleting = true; tick(); }, 1800);
+                return;
+            }
+        } else {
+            charIndex--;
+            el.textContent = line.slice(0, charIndex);
+            if (charIndex === 0) {
+                deleting = false;
+                lineIndex = (lineIndex + 1) % lines.length;
+                setTimeout(tick, 400);
+                return;
+            }
+        }
+        setTimeout(tick, deleting ? 30 : 55);
+    }
+    tick();
+}
+
+/* =========================================================
+   MUSIC TOGGLE — ambient background audio, off by default
+   (browsers block autoplay with sound anyway). Add a file at
+   audio/background-music.mp3 to enable; the button disables
+   itself automatically if that file is missing.
+   ========================================================= */
+function initMusicToggle() {
+    const btn = document.getElementById('music-toggle');
+    const audio = document.getElementById('bg-audio');
+    if (!btn || !audio) return;
+
+    audio.volume = 0.35;
+
+    audio.addEventListener('error', () => {
+        btn.disabled = true;
+        btn.title = 'Add audio/background-music.mp3 to enable';
+    }, true);
+
+    btn.addEventListener('click', () => {
+        if (audio.paused) {
+            audio.play()
+                .then(() => {
+                    btn.classList.add('playing');
+                    btn.textContent = '🔊';
+                    btn.setAttribute('aria-pressed', 'true');
+                })
+                .catch(() => {
+                    btn.disabled = true;
+                    btn.title = 'Add audio/background-music.mp3 to enable';
+                });
+        } else {
+            audio.pause();
+            btn.classList.remove('playing');
+            btn.textContent = '🔈';
+            btn.setAttribute('aria-pressed', 'false');
         }
     });
 }

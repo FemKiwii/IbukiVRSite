@@ -42,6 +42,14 @@
     <div class="bg-crt"></div>
     <canvas id="bg-stars"></canvas>
 
+    <!-- Optional ambient background music. Add your own file at
+         audio/background-music.mp3 to enable — the button auto-disables
+         itself if that file isn't there yet. -->
+    <audio id="bg-audio" loop preload="none">
+        <source src="audio/background-music.mp3" type="audio/mpeg">
+    </audio>
+    <button type="button" id="music-toggle" class="music-toggle" aria-label="Toggle background music" aria-pressed="false">🔈</button>
+
     <main class="container">
 
         <!-- Header: avatar, name, tag pills, bio -->
@@ -56,7 +64,10 @@
 
             <div id="tags" class="tags"></div>
 
-            <div id="bio" class="bio"></div>
+            <div id="bio" class="bio">
+                <p class="bio-line"><span id="bio-typed" aria-hidden="true"></span><span class="bio-cursor" aria-hidden="true">▍</span></p>
+                <span id="bio-sr" class="sr-only"></span>
+            </div>
             <div class="quick-copy-row" id="quick-copy-row"></div>
         </header>
 
