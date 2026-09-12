@@ -1,721 +1,320 @@
-/* =========================================
-   CSS VARIABLES & THEME SETUP
-   ========================================= */
-
 :root {
-    /* --- LIGHT MODE COLORS --- */
-    /* Background color of the entire page */
-    --bg-color: #f4f2ea;
-    /* Background color of cards (slightly transparent white) */
-    --card-bg: rgba(255, 255, 255, 0.9);
-    /* Main text color (dark plum) */
-    --text-main: #1f1a26;
-    /* Secondary text color (muted plum-grey) */
-    --text-secondary: #6b6272;
-    /* Primary accent color (kiwi green) */
-    --accent-color: #7ea828;
-    /* Accent color when hovering over buttons/links */
-    --accent-hover: #638420;
-    /* Subtle border color for cards and inputs */
-    --border-color: rgba(31, 26, 38, 0.08);
-    
-    /* --- SHADOWS --- */
-    /* Small shadow for subtle depth */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    /* Medium shadow for cards */
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
-    /* Large shadow for floating elements (profile pic) */
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    /* Swap these two to change the whole page's accent mood */
+    --accent: #b4e23c;      /* kiwi green */
+    --accent-2: #e85dc0;    /* orchid pink */
 
-    /* --- COMPONENT COLORS --- */
-    /* Background of individual link buttons */
-    --link-bg: #ffffff;
-    /* Background of link buttons when hovered */
-    --link-hover: #eef4de;
-    /* Background of the theme toggle button */
-    --toggle-bg: #e4e0d4;
-    /* Color of the sun/moon icon in the toggle */
-    --toggle-icon: #e85dc0;
-    /* Color of category headers */
-    --category-color: #9088a0;
+    --bg-base: #0e0c14;
+    --card-bg: rgba(255, 255, 255, 0.035);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --text-main: #f3f1f7;
+    --text-secondary: #9a91a6;
+    --text-muted: #6b6275;
 }
 
-/* Dark Mode Overrides */
-/* These variables override the :root variables when the 'data-theme' attribute is set to 'dark' */
-[data-theme="dark"] {
-    --bg-color: #15121c; /* Charcoal-plum background */
-    --card-bg: rgba(38, 32, 48, 0.7); /* Semi-transparent plum card */
-    --text-main: #f3f1f7; /* Off-white text */
-    --text-secondary: #a89cb3; /* Muted lavender-grey text */
-    --accent-color: #b4e23c; /* Kiwi green accent */
-    --accent-hover: #c8ee63;
-    --border-color: rgba(180, 226, 60, 0.12); /* Faint kiwi-green border */
+* { box-sizing: border-box; }
 
-    /* Darker shadows for dark mode */
-    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4);
-    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5);
-
-    /* Dark component colors */
-    --link-bg: rgba(255, 255, 255, 0.05); /* Very transparent white */
-    --link-hover: rgba(180, 226, 60, 0.08);
-    --toggle-bg: #322b3d;
-    --toggle-icon: #e85dc0;
-    --category-color: #cabfd4;
-}
-
-/* =========================================
-   RESET & BASE STYLES
-   ========================================= */
-
-/* Apply box-sizing: border-box to all elements for easier sizing calculations */
-* {
-    box-sizing: border-box;
+html, body {
     margin: 0;
     padding: 0;
-    /* Smooth transitions for theme switching and hover effects */
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, transform 0.2s ease;
-}
-
-body {
-    /* Font stack prioritizing 'Inter', then system fonts */
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: var(--bg-color);
+    min-height: 100%;
+    background: var(--bg-base);
     color: var(--text-main);
-    /* Use dvh (Dynamic Viewport Height) for mobile browsers to handle address bars correctly */
-    min-height: 100dvh; 
-    
-    /* Flexbox to center the main container horizontally */
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Align top to allow scrolling if content is long */
-    overflow-x: hidden; /* Prevent horizontal scrollbar */
-    position: relative;
-    padding-top: 2rem;
-    padding-bottom: 4rem;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-/* =========================================
-   BACKGROUND ANIMATION CANVAS
-   ========================================= */
-
-#bg-canvas {
-    position: fixed; /* Fix to viewport so it stays still while scrolling */
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1; /* Place behind all content */
-    pointer-events: none; /* Allow clicks to pass through to buttons */
+/* Background image + overlay so a photo can sit behind everything, dimmed */
+.bg-layer {
+    position: fixed;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: blur(18px) brightness(0.5);
+    transform: scale(1.1);
+    z-index: -2;
 }
 
-/* =========================================
-   MAIN CONTAINER
-   ========================================= */
+.bg-overlay {
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at top, rgba(180,226,60,0.08), transparent 60%),
+                radial-gradient(ellipse at bottom, rgba(232,93,192,0.08), transparent 60%),
+                var(--bg-base);
+    opacity: 0.92;
+    z-index: -1;
+}
 
 .container {
-    width: 100%;
-    max-width: 800px; /* Limit width on large screens */
-    padding: 0 1.5rem; /* Side padding for breathing room */
-    margin: 0 auto; /* Center horizontally */
-    z-index: 1; /* Sit above background canvas */
-    animation: fadeIn 0.8s ease-out; /* Entry animation */
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 3rem 1.25rem 2.5rem;
 }
 
-/* Keyframes for the fade-in animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================================
-   HEADER SECTION (Profile)
-   ========================================= */
+/* ---------- Header ---------- */
 
 header {
     text-align: center;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
+}
+
+.avatar-wrap {
     position: relative;
+    width: 128px;
+    height: 128px;
+    margin: 0 auto 1.25rem;
+}
+
+.avatar {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
     background: var(--card-bg);
-    backdrop-filter: blur(12px); /* Glassmorphism blur effect */
-    -webkit-backdrop-filter: blur(12px); /* Safari support */
-    padding: 2rem;
-    border-radius: 24px;
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-md);
+    border: 3px solid var(--bg-base);
+    box-shadow: 0 0 0 2px var(--accent),
+                0 0 24px 4px rgba(180, 226, 60, 0.35);
 }
 
-.profile-img-wrapper {
-    display: inline-block;
-    cursor: pointer;
-    position: relative;
+.badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--bg-base);
+    background: var(--card-bg);
 }
 
-.profile-img {
-    width: 110px;
-    height: 110px;
-    border-radius: 50%; /* Make image circular */
-    object-fit: cover; /* Ensure image covers area without stretching */
-    border: 4px solid var(--accent-color); /* Colored ring around avatar */
-    padding: 4px;
-    background-color: var(--card-bg);
-    margin-bottom: 1rem;
-    box-shadow: var(--shadow-lg);
-    transition: transform 0.3s ease;
-}
-
-/* Hover effect for profile picture */
-.profile-img:hover {
-    transform: scale(1.05) rotate(3deg);
-}
-
-.profile-name {
-    font-family: 'Baloo 2', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    font-size: 2rem;
+.name {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-main);
-    letter-spacing: -0.01em;
+    font-size: 2.4rem;
+    margin: 0 0 0.75rem;
+    letter-spacing: 0.01em;
 }
 
-.profile-bio {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 90%; /* Prevent bio from getting too wide */
-    margin: 0 auto 1.5rem auto; /* Center bio block and add space below */
+.name .accent {
+    color: var(--accent);
 }
 
-/* Share Button Styling */
-.share-btn {
-    background-color: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 0.6rem 1.2rem;
-    border-radius: 50px;
-    font-weight: 600;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     gap: 0.5rem;
-    transition: all 0.2s ease;
-    box-shadow: var(--shadow-sm);
+    margin-bottom: 1rem;
 }
 
-.share-btn svg {
-    width: 18px;
-    height: 18px;
-    fill: currentColor;
+.tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
 }
 
-.share-btn:hover {
-    background-color: var(--accent-hover);
+.bio {
+    font-style: italic;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.bio p { margin: 0.15rem 0; }
+
+/* ---------- Socials card ---------- */
+
+.socials-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(12px);
+}
+
+.socials-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.12em;
+    color: var(--text-muted);
+    margin-bottom: 0.85rem;
+}
+
+.socials-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-bottom: 0.5rem;
+}
+
+.social-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s ease, filter 0.15s ease;
+    text-decoration: none;
+}
+
+.social-icon svg {
+    width: 20px;
+    height: 20px;
+    fill: #fff;
+}
+
+.social-icon:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
+    filter: brightness(1.1);
 }
 
-/* =========================================
-   LINKS GRID & CATEGORIES
-   ========================================= */
+/* Live/placeholder status row, styled like a Discord presence card */
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 0.6rem 0.85rem;
+    margin-top: 0.75rem;
+}
+
+.status-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.status-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.status-handle {
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-line {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #f04747; /* overridden per-status by JS */
+}
+
+/* ---------- Link rows ---------- */
 
 .links-wrapper {
     display: flex;
-    flex-direction: column; /* Stack categories vertically */
-    gap: 2.5rem; /* Space between categories */
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-/* --- ENHANCED CATEGORY HEADER STYLING --- */
-.category-header {
-    /* --- LAYOUT & POSITIONING --- */
-    position: relative; /* Needed for pseudo-element positioning */
+.link-row {
     display: flex;
-    justify-content: center; /* Center the pill horizontally */
-    align-items: center;     /* Center content vertically */
-    width: 100%;
-    margin-bottom: 2rem; /* Increased space for a cleaner look */
-    z-index: 1;
-}
-
-/* The Glassmorphism Pill Background (Pseudo-element) */
-.category-header::before {
-    content: '';
-    position: absolute;
-    inset: 0; /* Spans the full height/width of the header */
-    background: var(--card-bg); /* Uses your theme's card background */
-    backdrop-filter: blur(8px); /* The "Frosted Glass" effect */
-    -webkit-backdrop-filter: blur(8px);
-    border-radius: 50px; /* Fully rounded pill shape */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle highlight border */
-    box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.05), /* Soft drop shadow */
-        inset 0 1px 0 rgba(255, 255, 255, 0.1); /* Inner highlight for 3D feel */
-    z-index: -1; /* Places background behind the text */
-}
-
-/* The Text Styling inside the header */
-.category-header span {
-    display: block;
-    font-size: 0.75rem; /* Slightly smaller for elegance */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.2em; /* Wide spacing looks more "luxury" */
-    
-    /* Text Gradient Effect (Makes text look metallic/vibrant) */
-    background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    
-    padding: 0.6rem 1.5rem; /* Generous padding inside the pill */
-    
-    /* Subtle entrance animation */
-    animation: fadeInPill 1s ease-out forwards;
-    opacity: 0;
-    transform: translateY(-10px);
-}
-
-/* Animation Keyframes for the Header Text */
-@keyframes fadeInPill {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Dark Mode Specific Tweaks for the Glass Effect */
-[data-theme="dark"] .category-header::before {
-    background: rgba(30, 41, 59, 0.6); /* Darker glass for dark mode */
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 
-        0 4px 6px -1px rgba(0, 0, 0, 0.3),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
-}
-
-.links-grid {
-    display: grid;
-    grid-template-columns: 1fr; /* Default: 1 column (Mobile) */
-    gap: 1rem; /* Space between cards */
-}
-
-/* Tablet: 2 columns */
-@media (min-width: 600px) {
-    .links-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-/* Desktop: 3 columns */
-@media (min-width: 900px) {
-    .links-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-/* =========================================
-   LINK CARD DESIGN
-   ========================================= */
-
-.link-card {
-    display: flex; /* Use Flexbox to align icon, text, and arrow */
-    align-items: center; /* Vertically center items */
-    justify-content: flex-start; /* Align items to the left (Desktop default) */
-    background-color: var(--link-bg);
-    padding: 1.25rem;
+    align-items: center;
+    gap: 0.85rem;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
-    text-decoration: none; /* Remove underline from links */
+    padding: 0.75rem 1rem;
+    text-decoration: none;
     color: var(--text-main);
-    border: 1px solid var(--border-color);
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smooth hover animation */
-    height: 100%; /* Ensure cards in a row have equal height */
+    transition: border-color 0.15s ease, transform 0.15s ease, background 0.15s ease;
 }
 
-/* Hover state for cards */
-.link-card:hover {
-    transform: translateY(-4px); /* Lift card up slightly */
-    background-color: var(--link-hover);
-    box-shadow: var(--shadow-lg);
-    border-color: transparent;
+.link-row:hover {
+    transform: translateX(2px);
+    border-color: var(--row-color, var(--accent));
+    background: rgba(255, 255, 255, 0.06);
 }
 
-/* Active/Click state for cards */
-.link-card:active {
-    transform: scale(0.98); /* Shrink slightly when clicked */
-}
-
-/* --- Icon Styling --- */
 .link-icon {
-    width: 28px;
-    height: 28px;
-    fill: var(--text-main); /* SVG fill color */
-    flex-shrink: 0; /* Prevent icon from shrinking */
-    margin-right: 1rem; /* Space between icon and text */
-    transition: fill 0.3s ease;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--row-color, var(--accent));
 }
 
-/* Change icon color on card hover */
-.link-card:hover .link-icon {
-    fill: var(--accent-color);
-}
-
-/* --- Text Styling --- */
-.link-text {
-    flex-grow: 1; /* Allow text to take up remaining space */
-    font-weight: 600;
-    font-size: 0.95rem;
-    text-align: left; /* Default text alignment */
-}
-
-/* --- Arrow Icon Styling --- */
-.link-arrow {
+.link-icon svg {
     width: 18px;
     height: 18px;
-    fill: var(--text-secondary);
-    opacity: 0; /* Hidden by default */
-    transform: translateX(-10px); /* Start slightly to the left */
-    transition: all 0.3s ease;
+    fill: #fff;
 }
 
-/* Show arrow on hover */
-.link-card:hover .link-arrow {
-    opacity: 1;
-    transform: translateX(0); /* Move to natural position */
+.link-text {
+    flex: 1;
+    min-width: 0;
 }
 
-/* =========================================
-   MOBILE ADJUSTMENTS (FIX)
-   ========================================= */
-
-@media (max-width: 600px) {
-    /* Center the content inside the card */
-    .link-card {
-        justify-content: center;
-        flex-direction: column; /* Stack icon and text vertically */
-        text-align: center;
-        padding: 1rem 1.25rem; /* Adjust padding for vertical layout */
-    }
-
-    /* Adjust icon spacing for vertical stack */
-    .link-icon {
-        margin-right: 0; /* Remove right margin */
-        margin-bottom: 0.5rem; /* Add bottom margin for spacing */
-    }
-
-    /* Center the text itself */
-    .link-text {
-        text-align: center;
-    }
-
-    /* Hide the arrow on mobile to keep it clean */
-    .link-arrow {
-        display: none;
-    }
+.link-title {
+    font-weight: 600;
+    font-size: 0.95rem;
 }
 
-/* =========================================
-   FOOTER & CONTROLS
-   ========================================= */
+.link-subtitle {
+    font-style: italic;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.link-arrow {
+    flex-shrink: 0;
+    color: var(--text-muted);
+    font-size: 1.1rem;
+}
+
+/* Section divider, e.g. "✦ ABOUT ME ✦" */
+.divider {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin: 0.75rem 0 0.25rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+}
+
+.divider .diamond { color: var(--accent-2); }
+
+/* ---------- Footer ---------- */
 
 footer {
-    margin-top: 4rem;
     text-align: center;
-    font-size: 0.85rem;
-    color: var(--text-secondary);
-    display: flex;
-    flex-direction: column; /* Stack footer elements vertically */
-    align-items: center;
-    gap: 1.5rem;
-    padding-bottom: 2rem;
-}
-
-/* Container for Theme and QR buttons to align them side-by-side */
-.footer-controls {
-    display: flex;
-    gap: 1rem; /* Space between buttons */
-    align-items: center;
-    justify-content: center;
-}
-
-/* Theme Toggle Button */
-.theme-toggle {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    padding: 0.75rem;
-    border-radius: 50%; /* Make button circular */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.theme-toggle:hover {
-    transform: rotate(15deg) scale(1.1); /* Rotate and grow on hover */
-    background-color: var(--link-hover);
-}
-
-.theme-toggle svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--toggle-icon);
-}
-
-/* QR Code Button */
-.qr-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    cursor: pointer;
-    padding: 0.75rem;
-    border-radius: 50%; /* Make button circular */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.3s ease, background-color 0.3s ease;
-}
-
-.qr-btn:hover {
-    transform: scale(1.1); /* Grow on hover */
-    background-color: var(--link-hover);
-}
-
-.qr-btn svg {
-    width: 20px;
-    height: 20px;
-    fill: var(--text-main); /* Use main text color for QR icon */
-}
-
-/* Legal Links Styling */
-.legal-links {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.legal-btn {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
+    margin-top: 2rem;
+    font-style: italic;
     font-size: 0.8rem;
-    cursor: pointer;
-    text-decoration: underline;
-    transition: color 0.2s;
+    color: var(--text-muted);
 }
 
-.legal-btn:hover {
-    color: var(--accent-color);
-}
-
-.separator {
-    opacity: 0.5;
-}
-
-/* =========================================
-   CREDITS & DISCLOSURE
-   ========================================= */
-
-.credits-section {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem; /* Space between the copyright and AI disclosure */
-    margin-top: 0.5rem;
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    width: 100%;
-}
-
-/* Update existing GitHub Credit to be part of the flex column */
-.github-credit {
-    opacity: 0.8;
-    font-weight: 500;
-    text-align: center;
-}
-
-.github-credit a {
-    color: var(--text-main); /* Make the name stand out more */
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.2s ease;
-}
-
-.github-credit a:hover {
-    color: var(--accent-color);
-    text-decoration: underline;
-}
-
-/* AI Disclosure Styling */
-.ai-disclosure {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-wrap: wrap; /* Allows wrapping on very small screens */
-    gap: 0.3rem;
-    opacity: 0.6;
-    font-size: 0.75rem; /* Slightly smaller text for the disclosure */
-}
-
-.ai-disclosure a {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-weight: 600;
-    border-bottom: 1px dotted var(--text-secondary); /* Dotted underline for a subtle technical look */
-    transition: all 0.2s ease;
-}
-
-.ai-disclosure a:hover {
-    color: var(--accent-color);
-    border-bottom-style: solid;
-}
-
-/* =========================================
-   MODALS (Legal & QR)
-   ========================================= */
-
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0,0,0,0.6); /* Black with opacity */
-    backdrop-filter: blur(4px);
-    align-items: center;
-    justify-content: center;
-}
-
-/* When active, display as flex to center content */
-.modal.active {
-    display: flex;
-}
-
-.modal-content {
-    background-color: var(--card-bg);
-    margin: auto;
-    padding: 2rem;
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    width: 90%;
-    max-width: 500px;
-    box-shadow: var(--shadow-lg);
-    position: relative;
-    animation: modalFadeIn 0.3s ease;
-}
-
-@keyframes modalFadeIn {
-    from { opacity: 0; transform: scale(0.9); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-.close-modal {
-    color: var(--text-secondary);
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-}
-
-.close-modal:hover {
-    color: var(--text-main);
-}
-
-.modal-body h2 {
-    margin-bottom: 1rem;
-    color: var(--text-main);
-}
-
-.modal-body p {
-    margin-bottom: 0.8rem;
-    line-height: 1.5;
-    color: var(--text-secondary);
-}
-
-/* QR Code Specifics */
-.qr-modal-content {
-    text-align: center;
-    max-width: 300px;
-}
-
-.qr-placeholder {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    margin: 1rem 0;
-    display: inline-block;
-}
-
-.qr-placeholder img {
-    display: block;
-    width: 200px;
-    height: 200px;
-}
-
-.qr-caption {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-}
-
-/* =========================================
-   TOAST NOTIFICATION
-   ========================================= */
-
-.toast {
-    position: fixed;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%) translateY(20px);
-    background-color: var(--text-main);
-    color: var(--bg-color);
-    padding: 0.8rem 1.5rem;
-    border-radius: 50px;
-    box-shadow: var(--shadow-lg);
-    z-index: 2000;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-    font-weight: 500;
-}
-
-.toast:not(.hidden) {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-}
-
-/* =========================================
-   CREDITS BACK TO TOP BUTTON
-   ========================================= */
-
-.credits-back-to-top {
-    background: none;
-    border: none;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    text-decoration: none; /* No underline initially */
-    transition: color 0.2s ease, text-decoration 0.2s ease;
-    padding: 0.5rem 0;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.credits-back-to-top:hover {
-    color: var(--accent-color);
-    text-decoration: underline; /* Underline on hover */
-}
-
-.credits-back-to-top svg {
-    width: 16px;
-    height: 16px;
-    fill: currentColor;
+@media (max-width: 380px) {
+    .name { font-size: 2rem; }
+    .avatar-wrap { width: 108px; height: 108px; }
 }
