@@ -22,6 +22,14 @@ const CONFIG = {
         "who vibes with energy like stars ✧"
     ],
 
+    // Small "copy" pills under the bio for handles people want to grab
+    // quickly. Fill in the real values (or delete an entry to drop that
+    // button entirely).
+    quickCopy: [
+        { label: "Discord", icon: "💬", value: "REPLACE_WITH_DISCORD_HANDLE" },
+        { label: "VRChat", icon: "🕶️", value: "REPLACE_WITH_VRCHAT_USERNAME" }
+    ],
+
     // Small icon row inside the socials card.
     // NOTE: file paths below assume these exact names inside your "colored-icons" folder —
     // rename the files to match, or tell me the real names and I'll fix the paths.
@@ -120,6 +128,19 @@ function render() {
         p.textContent = line;
         bioEl.appendChild(p);
     });
+
+    // Quick-copy handle pills
+    const quickCopyRow = document.getElementById('quick-copy-row');
+    if (quickCopyRow && CONFIG.quickCopy) {
+        CONFIG.quickCopy.forEach(item => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'quick-copy-btn';
+            btn.dataset.value = item.value;
+            btn.innerHTML = `<span class="quick-copy-icon">${item.icon}</span><span class="quick-copy-label">${item.label}</span>`;
+            quickCopyRow.appendChild(btn);
+        });
+    }
 
     // Socials row
     const socialsRow = document.getElementById('socials-row');
@@ -231,7 +252,41 @@ document.addEventListener('DOMContentLoaded', () => {
     initStarField();
     initAgeGate();
     initShareButton();
+    initQuickCopy();
+
+    requestAnimationFrame(() => {
+        document.querySelector('.container').classList.add('loaded');
+    });
 });
+
+/* =========================================================
+   QUICK-COPY PILLS — tap to copy a handle straight to clipboard.
+   ========================================================= */
+function initQuickCopy() {
+    document.querySelectorAll('.quick-copy-btn').forEach(btn => {
+        const labelEl = btn.querySelector('.quick-copy-label');
+        const originalLabel = labelEl.textContent;
+
+        btn.addEventListener('click', async () => {
+            const value = btn.dataset.value;
+            try {
+                await navigator.clipboard.writeText(value);
+                flash('Copied!');
+            } catch (err) {
+                flash('Copy failed');
+            }
+        });
+
+        function flash(text) {
+            labelEl.textContent = text;
+            btn.classList.add('copied');
+            setTimeout(() => {
+                labelEl.textContent = originalLabel;
+                btn.classList.remove('copied');
+            }, 1600);
+        }
+    });
+}
 
 /* =========================================================
    SHARE BUTTON — native share sheet on mobile, clipboard copy
