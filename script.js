@@ -9,7 +9,7 @@ const CONFIG = {
 
     // Full logo shown uncropped (not a circular avatar)
     avatar: "IbukiLogo.webp",
-    badge: "",
+    badge: "AvatarIcon.webp",
 
     name: "iBukiVR",
 
