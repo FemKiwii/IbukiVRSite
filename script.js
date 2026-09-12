@@ -112,6 +112,12 @@ function render() {
     // Name
     document.getElementById('name').textContent = CONFIG.name;
 
+    // Time-of-day greeting, based on the visitor's local clock
+    const greetingEl = document.getElementById('greeting');
+    if (greetingEl) {
+        greetingEl.textContent = getTimeGreeting();
+    }
+
     // Tags
     const tagsEl = document.getElementById('tags');
     CONFIG.tags.forEach(tag => {
@@ -253,11 +259,125 @@ document.addEventListener('DOMContentLoaded', () => {
     initAgeGate();
     initShareButton();
     initQuickCopy();
+    initTabTitleSwap();
+    initCursorSparkles();
+    initLogoEasterEgg();
 
     requestAnimationFrame(() => {
         document.querySelector('.container').classList.add('loaded');
     });
 });
+
+function getTimeGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 5) return 'still up? ✧';
+    if (hour < 12) return 'good morning ☀';
+    if (hour < 18) return 'good afternoon ✦';
+    return 'good evening ✧';
+}
+
+/* =========================================================
+   TAB TITLE SWAP — classic "come back!" trick when the tab
+   loses focus.
+   ========================================================= */
+function initTabTitleSwap() {
+    const originalTitle = document.title;
+    const awayTitle = 'come back! 🥺';
+    document.addEventListener('visibilitychange', () => {
+        document.title = document.hidden ? awayTitle : originalTitle;
+    });
+}
+
+/* =========================================================
+   CURSOR SPARKLE TRAIL — small twinkles that follow the mouse,
+   in the same yellow/blue tints as the star field. Skipped for
+   reduced-motion and touch-only (no real cursor) devices.
+   ========================================================= */
+function initCursorSparkles() {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
+
+    const colors = ['184, 192, 18', '47, 111, 201'];
+    let lastSpawn = 0;
+
+    document.addEventListener('pointermove', (e) => {
+        const now = performance.now();
+        if (now - lastSpawn < 70) return;
+        lastSpawn = now;
+
+        const el = document.createElement('span');
+        el.className = 'cursor-sparkle';
+        el.style.left = `${e.clientX}px`;
+        el.style.top = `${e.clientY}px`;
+        el.style.color = `rgb(${colors[Math.floor(Math.random() * colors.length)]})`;
+        el.textContent = '✦';
+        document.body.appendChild(el);
+        el.addEventListener('animationend', () => el.remove());
+    });
+}
+
+/* =========================================================
+   LOGO EASTER EGG — tap the logo 5 times quickly for a little
+   sparkle-burst surprise.
+   ========================================================= */
+function initLogoEasterEgg() {
+    const avatarWrap = document.querySelector('.avatar-wrap');
+    if (!avatarWrap) return;
+
+    const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const colors = ['184, 192, 18', '47, 111, 201'];
+    let clicks = 0;
+    let resetTimer = null;
+
+    avatarWrap.style.cursor = 'pointer';
+    avatarWrap.addEventListener('click', () => {
+        clicks++;
+        clearTimeout(resetTimer);
+        resetTimer = setTimeout(() => { clicks = 0; }, 2000);
+        if (clicks >= 5) {
+            clicks = 0;
+            triggerEasterEgg();
+        }
+    });
+
+    function triggerEasterEgg() {
+        if (!reducedMotion) burstSparkles();
+        showMessage();
+    }
+
+    function burstSparkles() {
+        const rect = avatarWrap.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const count = 18;
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+            const distance = 60 + Math.random() * 60;
+            const el = document.createElement('span');
+            el.className = 'egg-sparkle';
+            el.style.setProperty('--dx', `${Math.cos(angle) * distance}px`);
+            el.style.setProperty('--dy', `${Math.sin(angle) * distance}px`);
+            el.style.left = `${cx}px`;
+            el.style.top = `${cy}px`;
+            el.style.color = `rgb(${colors[i % 2]})`;
+            el.textContent = '✧';
+            document.body.appendChild(el);
+            el.addEventListener('animationend', () => el.remove());
+        }
+    }
+
+    function showMessage() {
+        const msg = document.createElement('div');
+        msg.className = 'egg-message';
+        msg.textContent = '✧ you found a secret! ✧';
+        document.body.appendChild(msg);
+        requestAnimationFrame(() => msg.classList.add('show'));
+        setTimeout(() => {
+            msg.classList.remove('show');
+            setTimeout(() => msg.remove(), 400);
+        }, 2000);
+    }
+}
 
 /* =========================================================
    QUICK-COPY PILLS — tap to copy a handle straight to clipboard.

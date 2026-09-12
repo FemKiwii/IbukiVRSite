@@ -133,6 +133,15 @@ header {
     letter-spacing: 0.01em;
 }
 
+.greeting {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-2);
+    margin: -0.35rem 0 0.9rem;
+}
+
 .name .accent {
     color: var(--accent);
 }
@@ -488,6 +497,64 @@ footer p:hover {
     outline-offset: 2px;
 }
 
+/* ---------- Cursor sparkle trail ---------- */
+
+.cursor-sparkle {
+    position: fixed;
+    z-index: 50;
+    pointer-events: none;
+    font-size: 12px;
+    transform: translate(-50%, -50%);
+    animation: sparkle-trail-fade 0.7s ease-out forwards;
+}
+
+@keyframes sparkle-trail-fade {
+    0% { opacity: 0.9; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(-50%, -65%) scale(0.4); }
+}
+
+/* ---------- Logo easter egg ---------- */
+
+.egg-sparkle {
+    position: fixed;
+    z-index: 60;
+    pointer-events: none;
+    font-size: 16px;
+    transform: translate(-50%, -50%);
+    animation: egg-burst 0.9s ease-out forwards;
+}
+
+@keyframes egg-burst {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    100% { opacity: 0; transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0.3); }
+}
+
+.egg-message {
+    position: fixed;
+    left: 50%;
+    top: 14%;
+    transform: translate(-50%, -10px);
+    background: rgba(12, 46, 89, 0.55);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    z-index: 61;
+    pointer-events: none;
+}
+
+.egg-message.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
 @media (prefers-reduced-motion: reduce) {
     .social-icon,
     .link-row,
@@ -496,6 +563,7 @@ footer p:hover {
     .avatar,
     .divider .diamond,
     .container,
+    .egg-message,
     footer p {
         transition: none;
         animation: none;
@@ -506,6 +574,10 @@ footer p:hover {
     }
     .bg-layer {
         transform: none;
+    }
+    .cursor-sparkle,
+    .egg-sparkle {
+        display: none;
     }
 }
 
