@@ -215,8 +215,15 @@ function initStarField() {
     // twinkling star against a bright bokeh photo, so we use the same
     // lightened working-tint as --accent-2 in style.css — same yellow family,
     // actually visible.
-    const STAR_COLOR = '184, 192, 18';
-    const STAR_COUNT = 90;
+    // Two-tone star palette: brand yellow (#54590C) and brand blue (#0C2E59).
+    // Both raw hexes are too dark/muddy to read as tiny dots against the
+    // navy bokeh photo, so each uses the same lightened working-tint already
+    // established elsewhere on the site (--accent-2 and --accent in style.css).
+    const STAR_COLORS = [
+        '184, 192, 18',  // brand yellow, lightened
+        '47, 111, 201'   // brand blue #0C2E59, lightened
+    ];
+    const STAR_COUNT = 130;
 
     let stars = [];
 
@@ -236,6 +243,9 @@ function initStarField() {
             this.size = Math.random() * 1.8 + 0.6;
             this.twinkleSpeed = Math.random() * 0.015 + 0.005;
             this.twinklePhase = Math.random() * Math.PI * 2;
+            this.color = STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)];
+            // ~1 in 12 stars is a bigger four-point sparkle instead of a plain dot
+            this.isSparkle = Math.random() < 0.08;
         }
 
         update() {
@@ -249,12 +259,24 @@ function initStarField() {
         draw() {
             const twinkle = (Math.sin(this.twinklePhase) + 1) / 2; // 0 -> 1
             const alpha = 0.2 + twinkle * 0.6;
-            ctx.shadowBlur = this.size * 4;
-            ctx.shadowColor = `rgba(${STAR_COLOR}, ${alpha})`;
-            ctx.fillStyle = `rgba(${STAR_COLOR}, ${alpha})`;
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.shadowBlur = this.size * (this.isSparkle ? 6 : 4);
+            ctx.shadowColor = `rgba(${this.color}, ${alpha})`;
+            ctx.fillStyle = `rgba(${this.color}, ${alpha})`;
+
+            if (this.isSparkle) {
+                const s = this.size * 2.4;
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y - s);
+                ctx.quadraticCurveTo(this.x, this.y, this.x + s, this.y);
+                ctx.quadraticCurveTo(this.x, this.y, this.x, this.y + s);
+                ctx.quadraticCurveTo(this.x, this.y, this.x - s, this.y);
+                ctx.quadraticCurveTo(this.x, this.y, this.x, this.y - s);
+                ctx.fill();
+            } else {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.shadowBlur = 0;
         }
     }
