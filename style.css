@@ -424,19 +424,6 @@ footer p:hover {
     color: var(--accent-2);
 }
 
-.visit-badge {
-    display: block;
-    margin: 0.6rem auto 0;
-    height: 20px;
-    opacity: 0.75;
-    border-radius: 4px;
-    transition: opacity 0.2s ease;
-}
-
-.visit-badge:hover {
-    opacity: 1;
-}
-
 @media (max-width: 380px) {
     .name { font-size: 2rem; }
     .avatar-wrap { max-width: 220px; }
