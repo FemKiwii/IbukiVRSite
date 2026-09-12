@@ -8,7 +8,7 @@ const CONFIG = {
     backgroundImageFallback: "Background1920w-q82.jpg",
 
     // Full logo shown uncropped (not a circular avatar)
-    avatar: "IbukiLogo.png",
+    avatar: "IbukiLogo.webp",
     badge: "",
 
     name: "iBukiVR",
