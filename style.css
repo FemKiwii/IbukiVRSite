@@ -180,11 +180,17 @@ header {
     width: 22px;
     height: 22px;
     object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(47, 111, 201, 0.45));
+    transition: filter 0.2s ease;
 }
 
 .social-icon:hover {
     transform: translateY(-2px);
     filter: brightness(1.15);
+}
+
+.social-icon:hover img {
+    filter: drop-shadow(0 0 9px rgba(47, 111, 201, 0.75));
 }
 
 /* Live/placeholder status row, styled like a Discord presence card */
@@ -281,6 +287,12 @@ header {
     width: 20px;
     height: 20px;
     object-fit: contain;
+    filter: drop-shadow(0 0 4px rgba(47, 111, 201, 0.4));
+    transition: filter 0.2s ease;
+}
+
+.link-row:hover .link-icon img {
+    filter: drop-shadow(0 0 8px rgba(184, 192, 18, 0.6));
 }
 
 .link-text {
@@ -336,4 +348,24 @@ footer {
 @media (max-width: 380px) {
     .name { font-size: 2rem; }
     .avatar-wrap { width: 108px; height: 108px; }
+}
+
+/* ---------- Accessibility ---------- */
+
+.social-icon:focus-visible,
+.link-row:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .social-icon,
+    .link-row,
+    .social-icon img,
+    .link-icon img {
+        transition: none;
+    }
+    .bg-layer {
+        transform: none;
+    }
 }

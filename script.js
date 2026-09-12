@@ -2,8 +2,10 @@
    CONFIG — this is the only section you should need to edit.
    ========================================================= */
 const CONFIG = {
-    // Uploaded to the repo root
-    backgroundImage: "Background1440.png",
+    // Optimized WebP (284KB) instead of the old 6MB PNG, with a JPG fallback
+    // for browsers that don't support WebP background-image.
+    backgroundImage: "Background1920w.webp",
+    backgroundImageFallback: "Background1920w-q82.jpg",
 
     // Full logo shown uncropped (not a circular avatar)
     avatar: "IbukiLogo.png",
@@ -26,7 +28,7 @@ const CONFIG = {
     socials: [
         { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
         { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
-        { icon: "colored-icons/shield.svg", url: "https://throne.com/ibukivr" },
+        { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
         { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL" }
     ],
 
@@ -45,7 +47,7 @@ const CONFIG = {
             links: [
                 { icon: "colored-icons/twitter.svg", title: "X", subtitle: "main social", url: "https://x.com/I_BukiVr" },
                 { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "support me", url: "https://ko-fi.com/ibuki_vr" },
-                { icon: "colored-icons/shield.svg", title: "Throne", subtitle: "my wishlist", url: "https://throne.com/ibukivr" },
+                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "my wishlist", url: "https://throne.com/ibukivr" },
                 { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL" }
             ]
         }
@@ -66,9 +68,20 @@ function iconImg(path) {
    RENDER
    ========================================================= */
 function render() {
-    // Background
+    // Background — fall back to the flat url() for older browsers, then
+    // upgrade to image-set() (WebP-first, JPG fallback) where supported.
     if (CONFIG.backgroundImage) {
-        document.getElementById('bg-layer').style.backgroundImage = `url('${CONFIG.backgroundImage}')`;
+        const bgLayer = document.getElementById('bg-layer');
+        const fallback = CONFIG.backgroundImageFallback || CONFIG.backgroundImage;
+        bgLayer.style.backgroundImage = `url('${fallback}')`;
+        const canUseImageSet = window.CSS && CSS.supports && (
+            CSS.supports('background-image', "image-set(url('x.webp') type('image/webp'))") ||
+            CSS.supports('background-image', "-webkit-image-set(url('x.webp') type('image/webp'))")
+        );
+        if (canUseImageSet && CONFIG.backgroundImageFallback) {
+            const prefix = CSS.supports('background-image', "image-set(url('x.webp') type('image/webp'))") ? 'image-set' : '-webkit-image-set';
+            bgLayer.style.backgroundImage = `${prefix}(url('${CONFIG.backgroundImage}') type('image/webp'), url('${fallback}') type('image/jpeg'))`;
+        }
     }
 
     // Avatar + badge
@@ -107,6 +120,9 @@ function render() {
         a.href = s.url;
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
+        const label = s.icon.split('/').pop().replace(/-gradient|\.svg$/g, '');
+        a.setAttribute('aria-label', label);
+        a.title = label.charAt(0).toUpperCase() + label.slice(1);
         a.innerHTML = iconImg(s.icon);
         socialsRow.appendChild(a);
     });
@@ -140,7 +156,9 @@ function render() {
 
     function showStatus({ avatar, handle, text, dotColor }) {
         const row = document.getElementById('status-row');
-        document.getElementById('status-avatar').src = avatar;
+        const statusAvatarEl = document.getElementById('status-avatar');
+        statusAvatarEl.src = avatar;
+        statusAvatarEl.loading = 'lazy';
         document.getElementById('status-handle').textContent = handle;
         document.getElementById('status-label').textContent = text;
         document.getElementById('status-dot').style.background = dotColor;
@@ -191,6 +209,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function initStarField() {
     const canvas = document.getElementById('bg-stars');
     if (!canvas) return;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        canvas.hidden = true;
+        return;
+    }
     const ctx = canvas.getContext('2d');
 
     const STAR_COLOR = '184, 192, 18'; // lightened working-tint of brand yellow #54590C, as an "R, G, B" string
