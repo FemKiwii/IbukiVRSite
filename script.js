@@ -210,7 +210,6 @@ function initStarField() {
     const canvas = document.getElementById('bg-stars');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const prefersReducedMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
     // The raw brand hex (#54590C -> 84,89,12) is too dark/olive to read as a
     // twinkling star against a bright bokeh photo, so we use the same
@@ -224,7 +223,6 @@ function initStarField() {
     function resize() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
-        if (prefersReducedMotion) animate();
     }
     window.addEventListener('resize', resize);
     resize();
@@ -233,10 +231,10 @@ function initStarField() {
         constructor() {
             this.x = Math.random() * canvas.width;
             this.y = Math.random() * canvas.height;
-            this.vx = prefersReducedMotion ? 0 : (Math.random() - 0.5) * 0.15;
-            this.vy = prefersReducedMotion ? 0 : (Math.random() - 0.5) * 0.15;
+            this.vx = (Math.random() - 0.5) * 0.15;
+            this.vy = (Math.random() - 0.5) * 0.15;
             this.size = Math.random() * 1.8 + 0.6;
-            this.twinkleSpeed = prefersReducedMotion ? 0 : (Math.random() * 0.015 + 0.005);
+            this.twinkleSpeed = Math.random() * 0.015 + 0.005;
             this.twinklePhase = Math.random() * Math.PI * 2;
         }
 
@@ -271,9 +269,7 @@ function initStarField() {
             s.update();
             s.draw();
         });
-        if (!prefersReducedMotion) {
-            requestAnimationFrame(animate);
-        }
+        requestAnimationFrame(animate);
     }
     animate();
 }
