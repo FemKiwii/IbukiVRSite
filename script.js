@@ -215,7 +215,7 @@ function initStarField() {
     }
     const ctx = canvas.getContext('2d');
 
-    const STAR_COLOR = '184, 192, 18'; // lightened working-tint of brand yellow #54590C, as an "R, G, B" string
+    const STAR_COLOR = '84, 89, 12'; // exact brand yellow #54590C
     const STAR_COUNT = 90;
 
     let stars = [];
@@ -248,7 +248,7 @@ function initStarField() {
 
         draw() {
             const twinkle = (Math.sin(this.twinklePhase) + 1) / 2; // 0 -> 1
-            const alpha = 0.15 + twinkle * 0.55;
+            const alpha = 0.25 + twinkle * 0.6;
             ctx.fillStyle = `rgba(${STAR_COLOR}, ${alpha})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
