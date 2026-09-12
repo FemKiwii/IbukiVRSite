@@ -30,8 +30,8 @@ html, body {
     inset: 0;
     background-size: cover;
     background-position: center;
-    filter: blur(18px) brightness(0.5);
-    transform: scale(1.1);
+    filter: blur(6px) brightness(0.85);
+    transform: scale(1.05);
     z-index: -2;
 }
 
@@ -40,7 +40,7 @@ html, body {
     inset: 0;
     background: radial-gradient(ellipse at top, rgba(47,111,201,0.14), transparent 60%),
                 radial-gradient(ellipse at bottom, rgba(184,192,18,0.08), transparent 60%),
-                rgba(3, 11, 22, 0.55);
+                rgba(3, 11, 22, 0.25);
     z-index: -1;
 }
 
@@ -177,6 +177,10 @@ header {
 }
 
 /* Live/placeholder status row, styled like a Discord presence card */
+.status-row[hidden] {
+    display: none;
+}
+
 .status-row {
     display: flex;
     align-items: center;
