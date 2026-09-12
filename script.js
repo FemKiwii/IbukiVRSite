@@ -26,8 +26,8 @@ const CONFIG = {
     // quickly. Fill in the real values (or delete an entry to drop that
     // button entirely).
     quickCopy: [
-        { label: "Discord", icon: "💬", value: "REPLACE_WITH_DISCORD_HANDLE" },
-        { label: "VRChat", icon: "🕶️", value: "REPLACE_WITH_VRCHAT_USERNAME" }
+        { label: "Discord", icon: "colored-icons/discord.svg", value: "REPLACE_WITH_DISCORD_HANDLE" },
+        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "REPLACE_WITH_VRCHAT_USERNAME" }
     ],
 
     // Small icon row inside the socials card.
@@ -143,7 +143,7 @@ function render() {
             btn.type = 'button';
             btn.className = 'quick-copy-btn';
             btn.dataset.value = item.value;
-            btn.innerHTML = `<span class="quick-copy-icon">${item.icon}</span><span class="quick-copy-label">${item.label}</span>`;
+            btn.innerHTML = `${iconImg(item.icon)}<span class="quick-copy-label">${item.label}</span>`;
             quickCopyRow.appendChild(btn);
         });
     }
