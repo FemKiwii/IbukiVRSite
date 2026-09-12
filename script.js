@@ -215,7 +215,11 @@ function initStarField() {
     }
     const ctx = canvas.getContext('2d');
 
-    const STAR_COLOR = '84, 89, 12'; // exact brand yellow #54590C
+    // The raw brand hex (#54590C -> 84,89,12) is too dark/olive to read as a
+    // twinkling star against a bright bokeh photo, so we use the same
+    // lightened working-tint as --accent-2 in style.css — same yellow family,
+    // actually visible.
+    const STAR_COLOR = '184, 192, 18';
     const STAR_COUNT = 90;
 
     let stars = [];
@@ -233,7 +237,7 @@ function initStarField() {
             this.y = Math.random() * canvas.height;
             this.vx = (Math.random() - 0.5) * 0.15;
             this.vy = (Math.random() - 0.5) * 0.15;
-            this.size = Math.random() * 1.6 + 0.4;
+            this.size = Math.random() * 1.8 + 0.6;
             this.twinkleSpeed = Math.random() * 0.015 + 0.005;
             this.twinklePhase = Math.random() * Math.PI * 2;
         }
@@ -248,11 +252,14 @@ function initStarField() {
 
         draw() {
             const twinkle = (Math.sin(this.twinklePhase) + 1) / 2; // 0 -> 1
-            const alpha = 0.25 + twinkle * 0.6;
+            const alpha = 0.2 + twinkle * 0.6;
+            ctx.shadowBlur = this.size * 4;
+            ctx.shadowColor = `rgba(${STAR_COLOR}, ${alpha})`;
             ctx.fillStyle = `rgba(${STAR_COLOR}, ${alpha})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
             ctx.fill();
+            ctx.shadowBlur = 0;
         }
     }
 

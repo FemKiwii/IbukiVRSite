@@ -81,6 +81,12 @@ header {
     object-fit: contain;
     border-radius: 18px;
     filter: drop-shadow(0 0 20px rgba(47, 111, 201, 0.45));
+    animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
 }
 
 .badge {
@@ -333,7 +339,15 @@ header {
     color: var(--text-muted);
 }
 
-.divider .diamond { color: var(--accent-2); }
+.divider .diamond {
+    color: var(--accent-2);
+    animation: sparkle-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes sparkle-pulse {
+    0%, 100% { opacity: 0.6; text-shadow: 0 0 0 transparent; }
+    50% { opacity: 1; text-shadow: 0 0 6px rgba(184, 192, 18, 0.8); }
+}
 
 /* ---------- Footer ---------- */
 
@@ -343,6 +357,16 @@ footer {
     font-style: italic;
     font-size: 0.8rem;
     color: var(--text-muted);
+}
+
+footer p {
+    display: inline-block;
+    transition: transform 0.2s ease, color 0.2s ease;
+}
+
+footer p:hover {
+    transform: scale(1.08);
+    color: var(--accent-2);
 }
 
 @media (max-width: 380px) {
@@ -362,8 +386,12 @@ footer {
     .social-icon,
     .link-row,
     .social-icon img,
-    .link-icon img {
+    .link-icon img,
+    .avatar,
+    .divider .diamond,
+    footer p {
         transition: none;
+        animation: none;
     }
     .bg-layer {
         transform: none;
