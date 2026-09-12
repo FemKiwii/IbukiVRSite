@@ -24,10 +24,10 @@ const CONFIG = {
     // NOTE: file paths below assume these exact names inside your "colored-icons" folder —
     // rename the files to match, or tell me the real names and I'll fix the paths.
     socials: [
-        { icon: "colored-icons/x.png", url: "https://x.com/I_BukiVr" },
-        { icon: "colored-icons/kofi.png", url: "https://ko-fi.com/ibuki_vr" },
-        { icon: "colored-icons/throne.png", url: "https://throne.com/ibukivr" },
-        { icon: "colored-icons/fansly.png", url: "REPLACE_WITH_FANSLY_URL" }
+        { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
+        { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
+        { icon: "colored-icons/shield.svg", url: "https://throne.com/ibukivr" },
+        { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL" }
     ],
 
     // No Discord ID given yet — leave disabled until you have one to plug in.
@@ -43,10 +43,10 @@ const CONFIG = {
         {
             divider: null,
             links: [
-                { icon: "colored-icons/x.png", title: "X", subtitle: "main social", url: "https://x.com/I_BukiVr" },
-                { icon: "colored-icons/kofi.png", title: "Ko-fi", subtitle: "support me", url: "https://ko-fi.com/ibuki_vr" },
-                { icon: "colored-icons/throne.png", title: "Throne", subtitle: "my wishlist", url: "https://throne.com/ibukivr" },
-                { icon: "colored-icons/fansly.png", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL" }
+                { icon: "colored-icons/twitter.svg", title: "X", subtitle: "main social", url: "https://x.com/I_BukiVr" },
+                { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "support me", url: "https://ko-fi.com/ibuki_vr" },
+                { icon: "colored-icons/shield.svg", title: "Throne", subtitle: "my wishlist", url: "https://throne.com/ibukivr" },
+                { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL" }
             ]
         }
         // TODO: once you're ready for a second group (like the "ABOUT ME" divider
