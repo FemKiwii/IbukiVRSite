@@ -7,7 +7,7 @@
 
     --bg-base: #030B16;    /* exact brand black */
     --card-bg: rgba(12, 46, 89, 0.18);   /* translucent brand-blue glass */
-    --card-border: rgba(47, 111, 201, 0.25);
+    --card-border: rgba(47, 111, 201, 0.18);
     --text-main: #f3f6fb;
     --text-secondary: #9fb0c7;
     --text-muted: #64748b;
@@ -349,7 +349,7 @@ header {
 .socials-card {
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 20px;
+    border-radius: 26px;
     padding: 1.25rem;
     margin-bottom: 1.5rem;
     backdrop-filter: blur(12px);
@@ -489,7 +489,7 @@ header {
     gap: 0.85rem;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
-    border-radius: 16px;
+    border-radius: 22px;
     padding: 0.75rem 1rem;
     text-decoration: none;
     color: var(--text-main);
@@ -508,7 +508,7 @@ header {
     flex-shrink: 0;
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -624,6 +624,7 @@ footer p:hover {
 .share-btn:focus-visible,
 .music-btn:focus-visible,
 .music-volume:focus-visible,
+.intro-splash:focus-visible,
 .quick-copy-btn:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -734,7 +735,7 @@ footer p:hover {
     max-width: 360px;
     background: rgba(12, 46, 89, 0.35);
     border: 1px solid var(--card-border);
-    border-radius: 20px;
+    border-radius: 26px;
     padding: 1.5rem;
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -824,4 +825,89 @@ footer p:hover {
 
 .age-gate-btn-confirm:hover {
     filter: brightness(1.15);
+}
+
+/* ---------- Intro splash ---------- */
+
+.intro-splash {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    text-align: center;
+    padding: 1.5rem;
+    background: rgba(3, 11, 22, 0.55);
+    backdrop-filter: blur(18px) saturate(1.1);
+    -webkit-backdrop-filter: blur(18px) saturate(1.1);
+    cursor: pointer;
+    transition: opacity 0.6s ease;
+}
+
+.intro-splash.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.intro-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 1.6rem;
+    margin: 0;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-2));
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: name-glow-shift 6s ease-in-out infinite;
+    max-width: 90vw;
+}
+
+.intro-subtext {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+    margin: 0;
+    animation: intro-subtext-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes intro-subtext-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro-text, .intro-subtext, .intro-splash {
+        animation: none;
+    }
+}
+
+/* ---------- Music progress bar ---------- */
+
+.music-progress {
+    width: 56px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.music-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), var(--accent-2));
+    border-radius: 999px;
+    transition: width 0.15s linear;
+}
+
+@media (max-width: 380px) {
+    .music-progress { width: 34px; }
 }

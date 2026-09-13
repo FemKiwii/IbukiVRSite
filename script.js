@@ -263,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initLogoEasterEgg();
     initTypewriterBio();
     initMusicToggle();
+    initIntroSplash();
 
     requestAnimationFrame(() => {
         document.querySelector('.container').classList.add('loaded');
@@ -461,6 +462,8 @@ function initMusicToggle() {
     const playPauseBtn = document.getElementById('music-playpause');
     const stopBtn = document.getElementById('music-stop');
     const volumeSlider = document.getElementById('music-volume');
+    const progress = document.getElementById('music-progress');
+    const progressFill = document.getElementById('music-progress-fill');
     const audio = document.getElementById('bg-audio');
     if (!player || !playPauseBtn || !stopBtn || !volumeSlider || !audio) return;
 
@@ -489,42 +492,12 @@ function initMusicToggle() {
             .then(() => { setPlayingUI(true); return true; })
             .catch(() => { setPlayingUI(false); return false; });
     }
-
-    // Browsers block autoplay WITH SOUND, full stop — no code workaround exists
-    // for that. What they do allow is silent (muted) autoplay. So: start muted
-    // right away (this reliably succeeds and the player visibly shows
-    // "playing" immediately on load), then unmute the instant the visitor
-    // interacts with the page at all — at that point sound just starts, no
-    // extra click on the player needed.
-    audio.muted = true;
-    attemptPlay().then(started => {
-        if (started) return;
-        // Some very restrictive setups block even muted autoplay — fall back
-        // to starting (unmuted) on the visitor's first interaction instead.
-        const startOnFirstInteraction = () => {
-            audio.muted = false;
-            attemptPlay();
-        };
-        document.addEventListener('click', startOnFirstInteraction, { once: true });
-        document.addEventListener('keydown', startOnFirstInteraction, { once: true });
-        document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
-    });
-
-    // If we did start muted, unmute on the visitor's first interaction so
-    // sound actually kicks in.
-    function unmuteOnFirstInteraction() {
-        if (audio.muted) audio.muted = false;
-        document.removeEventListener('click', unmuteOnFirstInteraction);
-        document.removeEventListener('keydown', unmuteOnFirstInteraction);
-        document.removeEventListener('touchstart', unmuteOnFirstInteraction);
-    }
-    document.addEventListener('click', unmuteOnFirstInteraction, { once: true });
-    document.addEventListener('keydown', unmuteOnFirstInteraction, { once: true });
-    document.addEventListener('touchstart', unmuteOnFirstInteraction, { once: true });
+    // Exposed so the intro splash's click (a real user gesture) can start
+    // playback with sound directly — no muted-autoplay trick needed there.
+    player._attemptPlay = attemptPlay;
 
     playPauseBtn.addEventListener('click', () => {
         if (audio.paused) {
-            audio.muted = false;
             attemptPlay();
         } else {
             audio.pause();
@@ -541,6 +514,64 @@ function initMusicToggle() {
     volumeSlider.addEventListener('input', () => {
         audio.volume = Number(volumeSlider.value) / 100;
     });
+
+    if (progress && progressFill) {
+        audio.addEventListener('timeupdate', () => {
+            if (!audio.duration) return;
+            progressFill.style.width = `${(audio.currentTime / audio.duration) * 100}%`;
+        });
+        progress.addEventListener('click', (e) => {
+            if (!audio.duration) return;
+            const rect = progress.getBoundingClientRect();
+            const ratio = (e.clientX - rect.left) / rect.width;
+            audio.currentTime = ratio * audio.duration;
+        });
+    }
+}
+
+/* =========================================================
+   INTRO SPLASH — click/tap anywhere to enter. Fades out to
+   reveal the site, and its click is a genuine user gesture, so
+   it's used to start the music unmuted directly (the reliable,
+   proper way — rather than the muted-then-unmute workaround).
+   ========================================================= */
+function initIntroSplash() {
+    const splash = document.getElementById('intro-splash');
+    const textEl = document.getElementById('intro-text');
+    const player = document.getElementById('music-player');
+    if (!splash) return;
+
+    // One picked at random each time the page loads.
+    const INTRO_LINES = [
+        'cute lil elf wandering by… come peek at my links ♡',
+        'a sleepy elf drifted in… stay a while? ♡',
+        '✧ just a lil elf, just a lil chaos ✧',
+        'psst… wanna see what this elf\'s up to? ♡',
+        'curious about this lil elf? come look at my links ♡',
+        'a lil elf caught your eye… now come peek at my links ♡',
+        'tiny elf, cute vibes, links waiting for you ♡',
+        'you found the elf… now find what\'s in my links ♡',
+        'follow the little elf trail straight to my links ♡',
+        'elf spotted! come see what i left in my links ♡',
+        'come wander into my little elf world ♡'
+    ];
+    if (textEl) {
+        textEl.textContent = INTRO_LINES[Math.floor(Math.random() * INTRO_LINES.length)];
+    }
+
+    function enter() {
+        splash.classList.add('hidden');
+        if (player && player._attemptPlay) player._attemptPlay();
+        splash.removeEventListener('click', enter);
+        splash.removeEventListener('keydown', onKey);
+        setTimeout(() => { splash.hidden = true; }, 700);
+    }
+    function onKey(e) {
+        if (e.key === 'Enter' || e.key === ' ') enter();
+    }
+
+    splash.addEventListener('click', enter);
+    splash.addEventListener('keydown', onKey);
 }
 
 /* =========================================================

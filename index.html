@@ -42,6 +42,14 @@
     <div class="bg-crt"></div>
     <canvas id="bg-stars"></canvas>
 
+    <!-- Intro splash — click/tap anywhere to enter. This real user gesture
+         also lets the music start unmuted properly, instead of relying on
+         the muted-autoplay trick. -->
+    <div class="intro-splash" id="intro-splash" role="button" tabindex="0" aria-label="Enter site">
+        <p class="intro-text" id="intro-text"></p>
+        <p class="intro-subtext">tap anywhere to come in ♡</p>
+    </div>
+
     <!-- Ambient background music player. Add your own file at
          audio/background-music.mp3 to enable — the player auto-disables
          itself if that file isn't there yet. Tries to autoplay on load;
@@ -54,7 +62,9 @@
         <button type="button" id="music-playpause" class="music-btn" aria-label="Play or pause background music" aria-pressed="false">▶</button>
         <button type="button" id="music-stop" class="music-btn" aria-label="Stop background music">⏹</button>
         <input type="range" id="music-volume" class="music-volume" min="0" max="100" value="15" aria-label="Music volume">
+        <div class="music-progress" id="music-progress"><div class="music-progress-fill" id="music-progress-fill"></div></div>
     </div>
+
 
     <main class="container">
 
