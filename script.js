@@ -18,8 +18,8 @@ const CONFIG = {
     tags: ["Music Lover 🎶", "Gremlin 😈", "Dreamy Elf 🧝", "Soft & Sparkly ✨"],
 
     bio: [
-        "hi, i'm iBuki — a soft & sparkly gremlin elf",
-        "powered by music, stardust, and chaos ♡"
+        "hi i'm iBuki, a music loving elf",
+        "who vibes with energy like stars ✧"
     ],
 
     // Small "copy" pills under the bio for handles people want to grab
@@ -34,7 +34,7 @@ const CONFIG = {
     // NOTE: file paths below assume these exact names inside your "colored-icons" folder —
     // rename the files to match, or tell me the real names and I'll fix the paths.
     socials: [
-        { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
+        { icon: "colored-icons/twitter.svg", url: "https://x.com/BukiVr" },
         { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
         { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
         { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
@@ -62,7 +62,7 @@ const CONFIG = {
             // little pill next to its title, e.g.:
             // { icon: "...", title: "...", subtitle: "...", url: "...", badge: "NEW" }
             links: [
-                { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@I_BukiVr", url: "https://x.com/I_BukiVr" },
+                { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@BukiVr", url: "https://x.com/BukiVr" },
                 { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
                 { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" },
                 { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
@@ -74,7 +74,7 @@ const CONFIG = {
     ],
 
     // TODO: no footer line was given yet
-    footerText: "iBukiVR 🧝 ♥"
+    footerText: "iBukiVR ♥"
 };
 
 function iconImg(path) {
@@ -299,7 +299,6 @@ function initCursorSparkles() {
     if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
 
     const colors = ['184, 192, 18', '47, 111, 201'];
-    const glyphs = ['✦', '🍃', '✧'];
     let lastSpawn = 0;
 
     document.addEventListener('pointermove', (e) => {
@@ -312,7 +311,7 @@ function initCursorSparkles() {
         el.style.left = `${e.clientX}px`;
         el.style.top = `${e.clientY}px`;
         el.style.color = `rgb(${colors[Math.floor(Math.random() * colors.length)]})`;
-        el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+        el.textContent = '✦';
         document.body.appendChild(el);
         el.addEventListener('animationend', () => el.remove());
     });
