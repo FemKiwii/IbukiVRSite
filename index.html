@@ -42,13 +42,19 @@
     <div class="bg-crt"></div>
     <canvas id="bg-stars"></canvas>
 
-    <!-- Optional ambient background music. Add your own file at
-         audio/background-music.mp3 to enable — the button auto-disables
-         itself if that file isn't there yet. -->
-    <audio id="bg-audio" loop preload="none">
+    <!-- Ambient background music player. Add your own file at
+         audio/background-music.mp3 to enable — the player auto-disables
+         itself if that file isn't there yet. Tries to autoplay on load;
+         browsers that block that will start it on the visitor's first
+         click/tap anywhere on the page instead. -->
+    <audio id="bg-audio" loop preload="auto">
         <source src="audio/background-music.mp3" type="audio/mpeg">
     </audio>
-    <button type="button" id="music-toggle" class="music-toggle" aria-label="Toggle background music" aria-pressed="false">🔈</button>
+    <div class="music-player" id="music-player">
+        <button type="button" id="music-playpause" class="music-btn" aria-label="Play or pause background music" aria-pressed="false">▶</button>
+        <button type="button" id="music-stop" class="music-btn" aria-label="Stop background music">⏹</button>
+        <input type="range" id="music-volume" class="music-volume" min="0" max="100" value="35" aria-label="Music volume">
+    </div>
 
     <main class="container">
 

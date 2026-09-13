@@ -13,7 +13,9 @@ const CONFIG = {
 
     name: "iBukiVR",
 
-    tags: ["Music Lover 🎶", "Gremlin 😈", "Dreamy Elf 🧝‍♀️", "Soft & Sparkly ✨"],
+    // TODO: no tag pills were given yet — add short words here if you want them,
+    // e.g. ["MUSIC LOVER", "VRCHAT", "18+"], or leave the array empty for none.
+    tags: [],
 
     bio: [
         "hi i'm iBuki, a music loving elf",
@@ -24,8 +26,8 @@ const CONFIG = {
     // quickly. Fill in the real values (or delete an entry to drop that
     // button entirely).
     quickCopy: [
-        { label: "Discord", icon: "colored-icons/discord.svg", value: "ibuki.vr" },
-        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "ibuki ~" }
+        { label: "Discord", icon: "colored-icons/discord.svg", value: "REPLACE_WITH_DISCORD_HANDLE" },
+        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "REPLACE_WITH_VRCHAT_USERNAME" }
     ],
 
     // Small icon row inside the socials card.
@@ -34,9 +36,8 @@ const CONFIG = {
     socials: [
         { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
         { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
-        { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" }
-        // Fansly not ready yet — add back here once there's a real URL:
-        // { icon: "colored-icons/fansly.svg", url: "https://fansly.com/...", ageGate: true }
+        { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
+        { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
     ],
 
     // No Discord ID given yet — leave disabled until you have one to plug in.
@@ -63,9 +64,8 @@ const CONFIG = {
             links: [
                 { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@I_BukiVr", url: "https://x.com/I_BukiVr" },
                 { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
-                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" }
-                // Fansly not ready yet — add back here once there's a real URL:
-                // { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "https://fansly.com/...", ageGate: true }
+                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" },
+                { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
             ]
         }
         // TODO: once you're ready for a second group (like the "ABOUT ME" divider
@@ -448,41 +448,81 @@ function initTypewriterBio() {
 }
 
 /* =========================================================
-   MUSIC TOGGLE — ambient background audio, off by default
-   (browsers block autoplay with sound anyway). Add a file at
-   audio/background-music.mp3 to enable; the button disables
+   MUSIC PLAYER — ambient background audio with play/pause,
+   stop, and a volume slider. Tries to autoplay on load; if the
+   browser's autoplay policy blocks that (most will, until the
+   visitor interacts with the page), it starts automatically on
+   their first click/tap anywhere instead. Add a file at
+   audio/background-music.mp3 to enable; the player disables
    itself automatically if that file is missing.
    ========================================================= */
 function initMusicToggle() {
-    const btn = document.getElementById('music-toggle');
+    const player = document.getElementById('music-player');
+    const playPauseBtn = document.getElementById('music-playpause');
+    const stopBtn = document.getElementById('music-stop');
+    const volumeSlider = document.getElementById('music-volume');
     const audio = document.getElementById('bg-audio');
-    if (!btn || !audio) return;
+    if (!player || !playPauseBtn || !stopBtn || !volumeSlider || !audio) return;
 
-    audio.volume = 0.35;
+    audio.volume = Number(volumeSlider.value) / 100;
+
+    function disablePlayer(reason) {
+        player.classList.add('disabled');
+        playPauseBtn.disabled = true;
+        stopBtn.disabled = true;
+        volumeSlider.disabled = true;
+        playPauseBtn.title = reason;
+    }
 
     audio.addEventListener('error', () => {
-        btn.disabled = true;
-        btn.title = 'Add audio/background-music.mp3 to enable';
+        disablePlayer('Add audio/background-music.mp3 to enable');
     }, true);
 
-    btn.addEventListener('click', () => {
+    function setPlayingUI(isPlaying) {
+        player.classList.toggle('playing', isPlaying);
+        playPauseBtn.textContent = isPlaying ? '⏸' : '▶';
+        playPauseBtn.setAttribute('aria-pressed', String(isPlaying));
+    }
+
+    function attemptPlay() {
+        return audio.play()
+            .then(() => { setPlayingUI(true); return true; })
+            .catch(() => { setPlayingUI(false); return false; });
+    }
+
+    // Try to autoplay as soon as the page loads.
+    attemptPlay().then(started => {
+        if (started) return;
+        // Blocked by the browser's autoplay policy — start on the visitor's
+        // very next interaction with the page instead, then stop listening.
+        const startOnFirstInteraction = () => {
+            attemptPlay();
+            document.removeEventListener('click', startOnFirstInteraction);
+            document.removeEventListener('keydown', startOnFirstInteraction);
+            document.removeEventListener('touchstart', startOnFirstInteraction);
+        };
+        document.addEventListener('click', startOnFirstInteraction, { once: true });
+        document.addEventListener('keydown', startOnFirstInteraction, { once: true });
+        document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
+    });
+
+    playPauseBtn.addEventListener('click', () => {
         if (audio.paused) {
-            audio.play()
-                .then(() => {
-                    btn.classList.add('playing');
-                    btn.textContent = '🔊';
-                    btn.setAttribute('aria-pressed', 'true');
-                })
-                .catch(() => {
-                    btn.disabled = true;
-                    btn.title = 'Add audio/background-music.mp3 to enable';
-                });
+            attemptPlay();
         } else {
             audio.pause();
-            btn.classList.remove('playing');
-            btn.textContent = '🔈';
-            btn.setAttribute('aria-pressed', 'false');
+            setPlayingUI(false);
         }
+    });
+
+    stopBtn.addEventListener('click', () => {
+        audio.pause();
+        audio.currentTime = 0;
+        setPlayingUI(false);
+    });
+
+    volumeSlider.addEventListener('input', () => {
+        audio.volume = Number(volumeSlider.value) / 100;
     });
 }
 
