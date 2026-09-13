@@ -26,8 +26,8 @@ const CONFIG = {
     // quickly. Fill in the real values (or delete an entry to drop that
     // button entirely).
     quickCopy: [
-        { label: "Discord", icon: "colored-icons/discord.svg", value: "REPLACE_WITH_DISCORD_HANDLE" },
-        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "REPLACE_WITH_VRCHAT_USERNAME" }
+        { label: "Discord", icon: "colored-icons/discord.svg", value: "ibuki.vr" },
+        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "ibuki ~" }
     ],
 
     // Small icon row inside the socials card.
@@ -490,24 +490,41 @@ function initMusicToggle() {
             .catch(() => { setPlayingUI(false); return false; });
     }
 
-    // Try to autoplay as soon as the page loads.
+    // Browsers block autoplay WITH SOUND, full stop — no code workaround exists
+    // for that. What they do allow is silent (muted) autoplay. So: start muted
+    // right away (this reliably succeeds and the player visibly shows
+    // "playing" immediately on load), then unmute the instant the visitor
+    // interacts with the page at all — at that point sound just starts, no
+    // extra click on the player needed.
+    audio.muted = true;
     attemptPlay().then(started => {
         if (started) return;
-        // Blocked by the browser's autoplay policy — start on the visitor's
-        // very next interaction with the page instead, then stop listening.
+        // Some very restrictive setups block even muted autoplay — fall back
+        // to starting (unmuted) on the visitor's first interaction instead.
         const startOnFirstInteraction = () => {
+            audio.muted = false;
             attemptPlay();
-            document.removeEventListener('click', startOnFirstInteraction);
-            document.removeEventListener('keydown', startOnFirstInteraction);
-            document.removeEventListener('touchstart', startOnFirstInteraction);
         };
         document.addEventListener('click', startOnFirstInteraction, { once: true });
         document.addEventListener('keydown', startOnFirstInteraction, { once: true });
         document.addEventListener('touchstart', startOnFirstInteraction, { once: true });
     });
 
+    // If we did start muted, unmute on the visitor's first interaction so
+    // sound actually kicks in.
+    function unmuteOnFirstInteraction() {
+        if (audio.muted) audio.muted = false;
+        document.removeEventListener('click', unmuteOnFirstInteraction);
+        document.removeEventListener('keydown', unmuteOnFirstInteraction);
+        document.removeEventListener('touchstart', unmuteOnFirstInteraction);
+    }
+    document.addEventListener('click', unmuteOnFirstInteraction, { once: true });
+    document.addEventListener('keydown', unmuteOnFirstInteraction, { once: true });
+    document.addEventListener('touchstart', unmuteOnFirstInteraction, { once: true });
+
     playPauseBtn.addEventListener('click', () => {
         if (audio.paused) {
+            audio.muted = false;
             attemptPlay();
         } else {
             audio.pause();
