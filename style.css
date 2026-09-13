@@ -858,12 +858,11 @@ footer p:hover {
     font-weight: 700;
     font-size: 1.6rem;
     margin: 0;
-    background: linear-gradient(90deg, var(--accent-2), var(--accent), var(--accent-2));
-    background-size: 200% auto;
+    background: linear-gradient(90deg, var(--accent-2), var(--accent));
+    background-size: 100% auto;
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
-    animation: name-glow-shift 6s ease-in-out infinite;
     max-width: 90vw;
 }
 
