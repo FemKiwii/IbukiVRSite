@@ -183,6 +183,10 @@ header {
     color: var(--text-secondary);
     font-size: 0.95rem;
     line-height: 1.6;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
+    max-width: 100%;
 }
 
 .bio p { margin: 0.15rem 0; }
@@ -864,6 +868,9 @@ footer p:hover {
     background-clip: text;
     color: transparent;
     max-width: 90vw;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
 .intro-subtext {

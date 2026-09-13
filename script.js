@@ -18,8 +18,8 @@ const CONFIG = {
     tags: ["Music Lover 🎶", "Gremlin 😈", "Dreamy Elf 🧝", "Soft & Sparkly ✨"],
 
     bio: [
-        "hi i'm iBuki, a music loving elf",
-        "who vibes with energy like stars ✧"
+        "hi, i'm iBuki — a soft & sparkly gremlin elf",
+        "powered by music, stardust, and chaos ♡"
     ],
 
     // Small "copy" pills under the bio for handles people want to grab
@@ -74,7 +74,7 @@ const CONFIG = {
     ],
 
     // TODO: no footer line was given yet
-    footerText: "iBukiVR ♥"
+    footerText: "iBukiVR 🧝 ♥"
 };
 
 function iconImg(path) {
@@ -299,6 +299,7 @@ function initCursorSparkles() {
     if (window.matchMedia && window.matchMedia('(hover: none)').matches) return;
 
     const colors = ['184, 192, 18', '47, 111, 201'];
+    const glyphs = ['✦', '🍃', '✧'];
     let lastSpawn = 0;
 
     document.addEventListener('pointermove', (e) => {
@@ -311,7 +312,7 @@ function initCursorSparkles() {
         el.style.left = `${e.clientX}px`;
         el.style.top = `${e.clientY}px`;
         el.style.color = `rgb(${colors[Math.floor(Math.random() * colors.length)]})`;
-        el.textContent = '✦';
+        el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
         document.body.appendChild(el);
         el.addEventListener('animationend', () => el.remove());
     });
