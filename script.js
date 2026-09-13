@@ -15,7 +15,7 @@ const CONFIG = {
 
     // TODO: no tag pills were given yet — add short words here if you want them,
     // e.g. ["MUSIC LOVER", "VRCHAT", "18+"], or leave the array empty for none.
-    tags: [],
+    tags: ["Music Lover 🎶", "Gremlin 😈", "Dreamy Elf 🧝", "Soft & Sparkly ✨"],
 
     bio: [
         "hi i'm iBuki, a music loving elf",
