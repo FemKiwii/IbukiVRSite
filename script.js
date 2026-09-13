@@ -13,9 +13,7 @@ const CONFIG = {
 
     name: "iBukiVR",
 
-    // TODO: no tag pills were given yet — add short words here if you want them,
-    // e.g. ["MUSIC LOVER", "VRCHAT", "18+"], or leave the array empty for none.
-    tags: [],
+    tags: ["Music Lover 🎶", "Gremlin 😈", "Dreamy Elf 🧝‍♀️", "Soft & Sparkly ✨"],
 
     bio: [
         "hi i'm iBuki, a music loving elf",
@@ -26,8 +24,8 @@ const CONFIG = {
     // quickly. Fill in the real values (or delete an entry to drop that
     // button entirely).
     quickCopy: [
-        { label: "Discord", icon: "colored-icons/discord.svg", value: "REPLACE_WITH_DISCORD_HANDLE" },
-        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "REPLACE_WITH_VRCHAT_USERNAME" }
+        { label: "Discord", icon: "colored-icons/discord.svg", value: "ibuki.vr" },
+        { label: "VRChat", icon: "colored-icons/vrchat.svg", value: "ibuki ~" }
     ],
 
     // Small icon row inside the socials card.
@@ -36,8 +34,9 @@ const CONFIG = {
     socials: [
         { icon: "colored-icons/twitter.svg", url: "https://x.com/I_BukiVr" },
         { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
-        { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
-        { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
+        { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" }
+        // Fansly not ready yet — add back here once there's a real URL:
+        // { icon: "colored-icons/fansly.svg", url: "https://fansly.com/...", ageGate: true }
     ],
 
     // No Discord ID given yet — leave disabled until you have one to plug in.
@@ -64,8 +63,9 @@ const CONFIG = {
             links: [
                 { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@I_BukiVr", url: "https://x.com/I_BukiVr" },
                 { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
-                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" },
-                { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
+                { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" }
+                // Fansly not ready yet — add back here once there's a real URL:
+                // { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "https://fansly.com/...", ageGate: true }
             ]
         }
         // TODO: once you're ready for a second group (like the "ABOUT ME" divider
