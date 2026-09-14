@@ -92,11 +92,21 @@ function motionReduced() {
     return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+// localStorage can throw in some restricted contexts (privacy modes,
+// certain embedded/file:// origins) — never let that take the whole
+// page down over a "remember this for next time" nicety.
+function safeStorageGet(key) {
+    try { return localStorage.getItem(key); } catch (err) { return null; }
+}
+function safeStorageSet(key, value) {
+    try { localStorage.setItem(key, value); } catch (err) { /* ignore */ }
+}
+
 function initMotionToggle() {
     const btn = document.getElementById('motion-toggle');
     if (!btn) return;
 
-    const saved = localStorage.getItem('motionReducedManual');
+    const saved = safeStorageGet('motionReducedManual');
     const osReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const startReduced = saved !== null ? saved === 'true' : osReduced;
 
@@ -105,7 +115,7 @@ function initMotionToggle() {
     btn.addEventListener('click', () => {
         const nowReduced = !document.documentElement.classList.contains('motion-reduced');
         applyState(nowReduced);
-        localStorage.setItem('motionReducedManual', String(nowReduced));
+        safeStorageSet('motionReducedManual', String(nowReduced));
     });
 
     function applyState(reduced) {
@@ -288,19 +298,18 @@ function render() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    render();
-    initMotionToggle();
-    initStarField();
-    initLeafDrift();
-    initAgeGate();
-    initShareButton();
-    initQuickCopy();
-    initTabTitleSwap();
-    initCursorSparkles();
-    initLogoEasterEgg();
-    initTypewriterBio();
-    initMusicToggle();
-    initIntroSplash();
+    const inits = [
+        render, initMotionToggle, initStarField, initLeafDrift, initAgeGate,
+        initShareButton, initQuickCopy, initTabTitleSwap, initCursorSparkles,
+        initLogoEasterEgg, initTypewriterBio, initMusicToggle, initIntroSplash
+    ];
+    inits.forEach(fn => {
+        try {
+            fn();
+        } catch (err) {
+            console.error(`${fn.name} failed:`, err);
+        }
+    });
 
     requestAnimationFrame(() => {
         document.querySelector('.container').classList.add('loaded');
@@ -506,7 +515,7 @@ function initMusicToggle() {
     if (!player || !playPauseBtn || !stopBtn || !volumeSlider || !audio) return;
 
     // Remember the visitor's volume choice between visits.
-    const savedVolume = localStorage.getItem('musicVolume');
+    const savedVolume = safeStorageGet('musicVolume');
     if (savedVolume !== null) volumeSlider.value = savedVolume;
     audio.volume = Number(volumeSlider.value) / 100;
 
@@ -554,7 +563,7 @@ function initMusicToggle() {
 
     volumeSlider.addEventListener('input', () => {
         audio.volume = Number(volumeSlider.value) / 100;
-        localStorage.setItem('musicVolume', volumeSlider.value);
+        safeStorageSet('musicVolume', volumeSlider.value);
     });
 
     if (progress && progressFill) {
@@ -877,11 +886,6 @@ function initStarField() {
             if (withMotion) f.update();
             f.draw();
         });
-    }
-
-    if (motionReduced()) {
-        drawFrame(false); // one static frame, no motion at all
-        return;
     }
 
     function animate() {
