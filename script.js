@@ -87,11 +87,6 @@ function iconImg(path) {
    visits). initStarField, initCursorSparkles, and initLeafDrift
    all check this before animating/spawning anything.
    ========================================================= */
-function motionReduced() {
-    if (document.documentElement.classList.contains('motion-reduced')) return true;
-    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-}
-
 // localStorage can throw in some restricted contexts (privacy modes,
 // certain embedded/file:// origins) — never let that take the whole
 // page down over a "remember this for next time" nicety.
@@ -102,24 +97,38 @@ function safeStorageSet(key, value) {
     try { localStorage.setItem(key, value); } catch (err) { /* ignore */ }
 }
 
+let _motionReducedState = false;
+
+function motionReduced() {
+    return _motionReducedState;
+}
+
+function computeInitialMotionState() {
+    // 'reduced' or 'normal' means the person explicitly chose via the toggle —
+    // that ALWAYS wins, in either direction. Only fall back to the OS setting
+    // when there's no explicit choice on record yet.
+    const manual = safeStorageGet('motionPreference');
+    if (manual === 'reduced') return true;
+    if (manual === 'normal') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+}
+
 function initMotionToggle() {
+    _motionReducedState = computeInitialMotionState();
     const btn = document.getElementById('motion-toggle');
+    document.documentElement.classList.toggle('motion-reduced', _motionReducedState);
     if (!btn) return;
 
-    const saved = safeStorageGet('motionReducedManual');
-    const osReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const startReduced = saved !== null ? saved === 'true' : osReduced;
-
-    applyState(startReduced);
+    applyButtonUI(_motionReducedState);
 
     btn.addEventListener('click', () => {
-        const nowReduced = !document.documentElement.classList.contains('motion-reduced');
-        applyState(nowReduced);
-        safeStorageSet('motionReducedManual', String(nowReduced));
+        _motionReducedState = !_motionReducedState;
+        safeStorageSet('motionPreference', _motionReducedState ? 'reduced' : 'normal');
+        document.documentElement.classList.toggle('motion-reduced', _motionReducedState);
+        applyButtonUI(_motionReducedState);
     });
 
-    function applyState(reduced) {
-        document.documentElement.classList.toggle('motion-reduced', reduced);
+    function applyButtonUI(reduced) {
         btn.setAttribute('aria-pressed', String(reduced));
         btn.textContent = reduced ? '✧' : '✦';
         btn.title = reduced ? 'Motion reduced — click to re-enable' : 'Reduce motion';
