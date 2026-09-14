@@ -273,7 +273,8 @@ function render() {
         if (section.divider) {
             const div = document.createElement('div');
             div.className = 'divider';
-            div.innerHTML = `<span class="diamond">✦</span><span>${section.divider}</span><span class="diamond">✦</span>`;
+            const ornament = `<svg class="divider-ornament" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1l1.6 5.4L15 8l-5.4 1.6L8 15l-1.6-5.4L1 8l5.4-1.6z" fill="currentColor"/></svg>`;
+            div.innerHTML = `${ornament}<span>${section.divider}</span>${ornament}`;
             wrapper.appendChild(div);
         }
         section.links.forEach(link => {
@@ -307,7 +308,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const inits = [
         render, initMotionToggle, initStarField, initLeafDrift, initAgeGate,
         initShareButton, initQuickCopy, initTabTitleSwap, initCursorSparkles,
-        initLogoEasterEgg, initTypewriterBio, initMusicToggle, initIntroSplash
+        initLogoEasterEgg, initTypewriterBio, initMusicToggle, initIntroSplash,
+        initScrollHint
     ];
     inits.forEach(fn => {
         try {
@@ -592,6 +594,26 @@ function initMusicToggle() {
    it's used to start the music unmuted directly (the reliable,
    proper way — rather than the muted-then-unmute workaround).
    ========================================================= */
+/* =========================================================
+   SCROLL HINT — a small bouncing arrow at the bottom, hinting
+   there's more below the fold. Fades out once the visitor
+   actually scrolls, and never shows at all if the whole page
+   already fits in the viewport.
+   ========================================================= */
+function initScrollHint() {
+    const hint = document.getElementById('scroll-hint');
+    if (!hint) return;
+
+    if (document.body.scrollHeight <= window.innerHeight + 40) {
+        hint.classList.add('hidden');
+        return;
+    }
+
+    window.addEventListener('scroll', () => {
+        hint.classList.add('hidden');
+    }, { once: true, passive: true });
+}
+
 function initIntroSplash() {
     const splash = document.getElementById('intro-splash');
     const textEl = document.getElementById('intro-text');

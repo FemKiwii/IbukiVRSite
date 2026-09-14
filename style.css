@@ -351,6 +351,7 @@ header {
 /* ---------- Socials card ---------- */
 
 .socials-card {
+    position: relative;
     background: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 26px;
@@ -358,6 +359,22 @@ header {
     margin-bottom: 1.5rem;
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
+    overflow: hidden;
+}
+
+.socials-card::after {
+    content: "";
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 46px;
+    height: 46px;
+    opacity: 0.5;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 20C4 20 3 10 10 4C17 -2 22 3 22 3C22 3 21 12 15 17C9 22 4 20 4 20Z' fill='%23b8c012'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+    transform: rotate(20deg);
 }
 
 .socials-header {
@@ -584,8 +601,12 @@ header {
     color: var(--text-muted);
 }
 
-.divider .diamond {
+.divider .diamond,
+.divider-ornament {
     color: var(--accent-2);
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
     animation: sparkle-pulse 2.4s ease-in-out infinite;
 }
 
@@ -1042,4 +1063,82 @@ html.motion-reduced {
     html {
         cursor: auto;
     }
+}
+
+/* ---------- Corner flourishes ---------- */
+
+.corner-flourish {
+    position: fixed;
+    width: 90px;
+    height: 90px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.corner-flourish-tl { top: 0; left: 0; }
+.corner-flourish-br { bottom: 0; right: 0; }
+
+@media (max-width: 480px) {
+    .corner-flourish { width: 60px; height: 60px; }
+}
+
+/* ---------- Drifting moon + cloud ---------- */
+
+.moon-drift {
+    position: fixed;
+    top: 2vh;
+    left: -180px;
+    width: 160px;
+    height: auto;
+    z-index: 1;
+    pointer-events: none;
+    animation: moon-drift-across 90s linear infinite;
+}
+
+@keyframes moon-drift-across {
+    from { transform: translateX(0); }
+    to { transform: translateX(calc(100vw + 180px)); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .moon-drift { animation: none; left: 8vw; }
+}
+html.motion-reduced .moon-drift {
+    animation: none;
+    left: 8vw;
+}
+
+/* ---------- Scroll-down hint ---------- */
+
+.scroll-hint {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 26px;
+    height: 26px;
+    color: var(--accent-2);
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 5;
+    animation: scroll-hint-bounce 1.6s ease-in-out infinite;
+    transition: opacity 0.4s ease;
+}
+
+.scroll-hint.hidden {
+    opacity: 0;
+}
+
+.scroll-hint svg {
+    width: 100%;
+    height: 100%;
+}
+
+@keyframes scroll-hint-bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(6px); }
+}
+
+html.motion-reduced .scroll-hint {
+    animation: none;
 }
