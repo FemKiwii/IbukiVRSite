@@ -11,7 +11,7 @@ const CONFIG = {
     avatar: "IbukiLogo.webp",
     badge: "AvatarIcon.webp",
 
-    name: "iBukiVR",
+    name: "IbukiVR",
 
     // TODO: no tag pills were given yet — add short words here if you want them,
     // e.g. ["MUSIC LOVER", "VRCHAT", "18+"], or leave the array empty for none.
@@ -35,7 +35,7 @@ const CONFIG = {
     // rename the files to match, or tell me the real names and I'll fix the paths.
     socials: [
         { icon: "colored-icons/twitter.svg", url: "https://x.com/BukiVr" },
-        { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibuki_vr" },
+        { icon: "colored-icons/kofi.svg", url: "https://ko-fi.com/ibukivr" },
         { icon: "colored-icons/throne-gradient.svg", url: "https://throne.com/ibukivr" },
         { icon: "colored-icons/fansly.svg", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
     ],
@@ -63,7 +63,7 @@ const CONFIG = {
             // { icon: "...", title: "...", subtitle: "...", url: "...", badge: "NEW" }
             links: [
                 { icon: "colored-icons/twitter.svg", title: "X", subtitle: "@BukiVr", url: "https://x.com/BukiVr" },
-                { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibuki_vr", url: "https://ko-fi.com/ibuki_vr" },
+                { icon: "colored-icons/kofi.svg", title: "Ko-fi", subtitle: "@ibukivr", url: "https://ko-fi.com/ibukivr" },
                 { icon: "colored-icons/throne-gradient.svg", title: "Throne", subtitle: "@ibukivr", url: "https://throne.com/ibukivr" },
                 { icon: "colored-icons/fansly.svg", title: "Fansly", subtitle: "18+ content", url: "REPLACE_WITH_FANSLY_URL", ageGate: true }
             ]
@@ -74,7 +74,7 @@ const CONFIG = {
     ],
 
     // TODO: no footer line was given yet
-    footerText: "iBukiVR ♥"
+    footerText: "IbukiVR ♥"
 };
 
 function iconImg(path) {
