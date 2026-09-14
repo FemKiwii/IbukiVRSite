@@ -629,6 +629,7 @@ footer p:hover {
 .music-btn:focus-visible,
 .music-volume:focus-visible,
 .intro-splash:focus-visible,
+.motion-toggle:focus-visible,
 .quick-copy-btn:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
@@ -713,6 +714,38 @@ footer p:hover {
     .bg-layer {
         transform: none;
     }
+}
+
+/* Same set of rules again, but triggered by the manual on-page toggle
+   (html.motion-reduced) rather than only the OS-level setting, so the
+   toggle actually behaves like "reduce motion" everywhere. */
+html.motion-reduced .social-icon,
+html.motion-reduced .link-row,
+html.motion-reduced .social-icon img,
+html.motion-reduced .link-icon img,
+html.motion-reduced .avatar,
+html.motion-reduced .divider .diamond,
+html.motion-reduced .container,
+html.motion-reduced .egg-message,
+html.motion-reduced .music-player,
+html.motion-reduced footer p {
+    transition: none;
+    animation: none;
+}
+html.motion-reduced .container {
+    opacity: 1;
+    transform: none;
+}
+html.motion-reduced .bg-layer {
+    transform: none;
+}
+html.motion-reduced .intro-text,
+html.motion-reduced .intro-subtext,
+html.motion-reduced .intro-splash {
+    animation: none;
+}
+html.motion-reduced {
+    cursor: auto;
 }
 
 /* ---------- Age gate modal ---------- */
@@ -916,4 +949,97 @@ footer p:hover {
 
 @media (max-width: 380px) {
     .music-progress { width: 34px; }
+}
+
+/* ---------- Accessibility: skip link ---------- */
+
+.skip-link {
+    position: fixed;
+    top: -60px;
+    left: 1rem;
+    z-index: 300;
+    background: var(--accent-brand-blue);
+    color: var(--text-main);
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 600;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 1rem;
+}
+
+/* ---------- Motion toggle ---------- */
+
+.motion-toggle {
+    position: fixed;
+    top: 1.25rem;
+    left: 1.25rem;
+    z-index: 40;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.motion-toggle:hover {
+    transform: translateY(-1px);
+    border-color: var(--accent);
+}
+
+.motion-toggle[aria-pressed="true"] {
+    opacity: 0.55;
+}
+
+/* ---------- Custom leaf cursor (desktop / precise-pointer only) ---------- */
+
+@media (hover: hover) and (pointer: fine) {
+    html {
+        cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='26' viewBox='0 0 24 24'%3E%3Cpath d='M4 20C4 20 3 10 10 4C17 -2 22 3 22 3C22 3 21 12 15 17C9 22 4 20 4 20Z' fill='%23b8c012' stroke='%232f6fc9' stroke-width='1.3'/%3E%3Cpath d='M5 19L18 4' stroke='%232f6fc9' stroke-width='1'/%3E%3C/svg%3E") 3 20, auto;
+    }
+}
+
+/* ---------- Falling leaf drift ---------- */
+
+.leaf-drift {
+    position: fixed;
+    top: -24px;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.85;
+    animation-name: leaf-fall;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+}
+
+@keyframes leaf-fall {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 0;
+    }
+    8% { opacity: 0.85; }
+    92% { opacity: 0.85; }
+    100% {
+        transform: translate(var(--leaf-sway, 40px), 100vh) rotate(var(--leaf-rotate, 220deg));
+        opacity: 0;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html {
+        cursor: auto;
+    }
 }

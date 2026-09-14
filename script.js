@@ -78,7 +78,42 @@ const CONFIG = {
 };
 
 function iconImg(path) {
-    return `<img src="${path}" alt="">`;
+    return `<img src="${path}" alt="" loading="lazy">`;
+}
+
+/* =========================================================
+   MOTION PREFERENCE — combines the OS-level "reduce motion"
+   setting with a manual on-page toggle (remembered across
+   visits). initStarField, initCursorSparkles, and initLeafDrift
+   all check this before animating/spawning anything.
+   ========================================================= */
+function motionReduced() {
+    if (document.documentElement.classList.contains('motion-reduced')) return true;
+    return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+function initMotionToggle() {
+    const btn = document.getElementById('motion-toggle');
+    if (!btn) return;
+
+    const saved = localStorage.getItem('motionReducedManual');
+    const osReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const startReduced = saved !== null ? saved === 'true' : osReduced;
+
+    applyState(startReduced);
+
+    btn.addEventListener('click', () => {
+        const nowReduced = !document.documentElement.classList.contains('motion-reduced');
+        applyState(nowReduced);
+        localStorage.setItem('motionReducedManual', String(nowReduced));
+    });
+
+    function applyState(reduced) {
+        document.documentElement.classList.toggle('motion-reduced', reduced);
+        btn.setAttribute('aria-pressed', String(reduced));
+        btn.textContent = reduced ? '✧' : '✦';
+        btn.title = reduced ? 'Motion reduced — click to re-enable' : 'Reduce motion';
+    }
 }
 
 /* =========================================================
@@ -254,7 +289,9 @@ function render() {
 
 document.addEventListener('DOMContentLoaded', () => {
     render();
+    initMotionToggle();
     initStarField();
+    initLeafDrift();
     initAgeGate();
     initShareButton();
     initQuickCopy();
@@ -302,6 +339,7 @@ function initCursorSparkles() {
     let lastSpawn = 0;
 
     document.addEventListener('pointermove', (e) => {
+        if (motionReduced()) return;
         const now = performance.now();
         if (now - lastSpawn < 70) return;
         lastSpawn = now;
@@ -467,6 +505,9 @@ function initMusicToggle() {
     const audio = document.getElementById('bg-audio');
     if (!player || !playPauseBtn || !stopBtn || !volumeSlider || !audio) return;
 
+    // Remember the visitor's volume choice between visits.
+    const savedVolume = localStorage.getItem('musicVolume');
+    if (savedVolume !== null) volumeSlider.value = savedVolume;
     audio.volume = Number(volumeSlider.value) / 100;
 
     function disablePlayer(reason) {
@@ -513,6 +554,7 @@ function initMusicToggle() {
 
     volumeSlider.addEventListener('input', () => {
         audio.volume = Number(volumeSlider.value) / 100;
+        localStorage.setItem('musicVolume', volumeSlider.value);
     });
 
     if (progress && progressFill) {
@@ -572,6 +614,13 @@ function initIntroSplash() {
 
     splash.addEventListener('click', enter);
     splash.addEventListener('keydown', onKey);
+
+    // Let the skip-link (for keyboard/screen-reader users) dismiss the
+    // splash too, instead of leaving them stuck behind it.
+    const skipLink = document.getElementById('skip-link');
+    if (skipLink) {
+        skipLink.addEventListener('click', enter);
+    }
 }
 
 /* =========================================================
@@ -770,13 +819,116 @@ function initStarField() {
         stars.push(new Star());
     }
 
-    function animate() {
+    // Fireflies: bigger, slower, wandering glow dots layered on top of the
+    // twinkling stars — same two accent colors, just a softer/organic look.
+    const FIREFLY_COUNT = 10;
+    class Firefly {
+        constructor() {
+            this.x = Math.random() * canvas.width;
+            this.y = Math.random() * canvas.height;
+            this.angle = Math.random() * Math.PI * 2;
+            this.speed = Math.random() * 0.25 + 0.1;
+            this.size = Math.random() * 1.8 + 2.2;
+            this.twinkleSpeed = Math.random() * 0.01 + 0.006;
+            this.twinklePhase = Math.random() * Math.PI * 2;
+            this.color = STAR_COLORS[Math.floor(Math.random() * STAR_COLORS.length)];
+        }
+        update() {
+            // Gentle random walk instead of a straight bounce, so it reads
+            // as "wandering" rather than "bouncing off walls."
+            this.angle += (Math.random() - 0.5) * 0.3;
+            this.x += Math.cos(this.angle) * this.speed;
+            this.y += Math.sin(this.angle) * this.speed;
+            if (this.x < -20) this.x = canvas.width + 20;
+            if (this.x > canvas.width + 20) this.x = -20;
+            if (this.y < -20) this.y = canvas.height + 20;
+            if (this.y > canvas.height + 20) this.y = -20;
+            this.twinklePhase += this.twinkleSpeed;
+        }
+        draw() {
+            const twinkle = (Math.sin(this.twinklePhase) + 1) / 2;
+            const alpha = 0.25 + twinkle * 0.55;
+            ctx.shadowBlur = this.size * 5;
+            ctx.shadowColor = `rgba(${this.color}, ${alpha})`;
+            ctx.fillStyle = `rgba(${this.color}, ${alpha})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+    }
+    let fireflies = [];
+    for (let i = 0; i < FIREFLY_COUNT; i++) {
+        fireflies.push(new Firefly());
+    }
+
+    let running = true;
+    document.addEventListener('visibilitychange', () => {
+        running = !document.hidden;
+    });
+
+    function drawFrame(withMotion) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         stars.forEach(s => {
-            s.update();
+            if (withMotion) s.update();
             s.draw();
         });
+        fireflies.forEach(f => {
+            if (withMotion) f.update();
+            f.draw();
+        });
+    }
+
+    if (motionReduced()) {
+        drawFrame(false); // one static frame, no motion at all
+        return;
+    }
+
+    function animate() {
+        if (running && !motionReduced()) {
+            drawFrame(true);
+        } else if (!running) {
+            // tab hidden — do nothing, just wait
+        } else {
+            // motion got turned off mid-session via the toggle — freeze as-is
+            drawFrame(false);
+        }
         requestAnimationFrame(animate);
     }
     animate();
+}
+
+/* =========================================================
+   FALLING LEAF DRIFT — every so often, a small leaf glyph
+   drifts down the screen with a gentle sway and rotation.
+   Skips entirely while motion is reduced.
+   ========================================================= */
+function initLeafDrift() {
+    const LEAF_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"><path d="M4 20C4 20 3 10 10 4C17 -2 22 3 22 3C22 3 21 12 15 17C9 22 4 20 4 20Z" fill="COLOR" opacity="0.85"/></svg>`;
+    const LEAF_COLORS = ['#b8c012', '#2f6fc9'];
+
+    function spawnLeaf() {
+        if (motionReduced()) {
+            scheduleNext();
+            return;
+        }
+        const leaf = document.createElement('div');
+        leaf.className = 'leaf-drift';
+        leaf.innerHTML = LEAF_SVG.replace('COLOR', LEAF_COLORS[Math.floor(Math.random() * LEAF_COLORS.length)]);
+        leaf.style.left = `${Math.random() * 100}vw`;
+        const duration = 9 + Math.random() * 6; // seconds
+        leaf.style.animationDuration = `${duration}s`;
+        leaf.style.setProperty('--leaf-sway', `${(Math.random() - 0.5) * 160}px`);
+        leaf.style.setProperty('--leaf-rotate', `${180 + Math.random() * 270}deg`);
+        document.body.appendChild(leaf);
+        leaf.addEventListener('animationend', () => leaf.remove());
+        scheduleNext();
+    }
+
+    function scheduleNext() {
+        const delay = 5000 + Math.random() * 6000; // 5–11s between leaves
+        setTimeout(spawnLeaf, delay);
+    }
+
+    scheduleNext();
 }

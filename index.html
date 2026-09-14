@@ -8,7 +8,7 @@
     <meta name="description" content="IbukiVR — music loving elf. All my links in one place.">
     <meta name="theme-color" content="#030B16">
     <meta name="color-scheme" content="dark">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://cdn.discordapp.com https://i.scdn.co; connect-src 'self' https://api.lanyard.rest; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://cdn.discordapp.com https://i.scdn.co; connect-src 'self' https://api.lanyard.rest; object-src 'none'; base-uri 'self'; form-action 'self'">
     <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="canonical" href="https://ibukivr.vercel.app/">
     <link rel="icon" type="image/png" href="IbukiLogo.png">
@@ -36,11 +36,15 @@
 </head>
 <body>
 
+    <a href="#main-content" class="skip-link" id="skip-link">Skip to content</a>
+
     <!-- Blurred background image, set via CONFIG.backgroundImage in script.js -->
     <div class="bg-layer" id="bg-layer"></div>
     <div class="bg-overlay"></div>
     <div class="bg-crt"></div>
     <canvas id="bg-stars"></canvas>
+
+    <button type="button" id="motion-toggle" class="motion-toggle" aria-pressed="false" aria-label="Toggle reduced motion" title="Reduce motion">✦</button>
 
     <!-- Intro splash — click/tap anywhere to enter. This real user gesture
          also lets the music start unmuted properly, instead of relying on
@@ -66,7 +70,7 @@
     </div>
 
 
-    <main class="container">
+    <main class="container" id="main-content">
 
         <!-- Header: avatar, name, tag pills, bio -->
         <header>
