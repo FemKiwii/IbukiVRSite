@@ -104,13 +104,10 @@ function motionReduced() {
 }
 
 function computeInitialMotionState() {
-    // 'reduced' or 'normal' means the person explicitly chose via the toggle —
-    // that ALWAYS wins, in either direction. Only fall back to the OS setting
-    // when there's no explicit choice on record yet.
+    // Default is always motion ON, regardless of the OS-level "reduce motion"
+    // setting — only an explicit click on the toggle turns it off from here on.
     const manual = safeStorageGet('motionPreference');
-    if (manual === 'reduced') return true;
-    if (manual === 'normal') return false;
-    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    return manual === 'reduced';
 }
 
 function initMotionToggle() {
